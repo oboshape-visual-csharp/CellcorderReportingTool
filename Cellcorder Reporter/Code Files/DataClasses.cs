@@ -8,7 +8,7 @@ using System.Windows.Forms;
 namespace Cellcorder_Reporter
 {
     // to declare what temperature scale the readings are using
-    enum TempScale
+    public enum TempScale
     {
         Celcius,
         Fahrenheit,
@@ -16,7 +16,7 @@ namespace Cellcorder_Reporter
     };
 
     // this is the class for storing all the readings for one single cell
-    class CellReading
+    public class CellReading
     {
         public CellReading()
         {
@@ -37,7 +37,7 @@ namespace Cellcorder_Reporter
 
     // this one is the to store one complete system set of readings
     // there are also some helper methods so they can be called on each test reading set
-    class TestResult
+    public class TestResult
     {
         public TestResult()
         {
@@ -48,7 +48,10 @@ namespace Cellcorder_Reporter
             installDate = "";
             dateFileCreated = DateTime.Now;
             temperatureScale = TempScale.UNSET;
+            includeInReporting = true;
+            comments = "No comments.";
         }
+        public bool         includeInReporting;  // set via checkbox in datagrid file listing
         public string       fileName;
         public DateTime     dateFileCreated;
         public String       location;
@@ -70,6 +73,7 @@ namespace Cellcorder_Reporter
         public int          lowSG_threshold;
         public TempScale    temperatureScale;
         public List<CellReading> Reading;
+        public string       comments;   // used in conjunction with data review comments
 
 
         //---------------------------------------------------------------------

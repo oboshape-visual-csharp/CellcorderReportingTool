@@ -13,10 +13,8 @@ namespace Cellcorder_Reporter
         public static string csvStoragePath = null;
         public static string pdfOutputFolderPath = null;
 
-        // this will be set to null on closing app
-        public static string[] fileListArray = null;
 
-        // datatable that stores the information for the file listing shown on main screen
-        public static DataTable fileListDataTable = new DataTable();
+        // storage for all the test readings in a dictionary for easy access
+        public static Dictionary<string, TestResult> allTestReadings = new Dictionary<string, TestResult>();
     }
 }

@@ -152,13 +152,12 @@
             // 
             // ButtonExtractData
             // 
-            this.ButtonExtractData.Location = new System.Drawing.Point(106, 432);
+            this.ButtonExtractData.Location = new System.Drawing.Point(15, 472);
             this.ButtonExtractData.Name = "ButtonExtractData";
-            this.ButtonExtractData.Size = new System.Drawing.Size(114, 23);
+            this.ButtonExtractData.Size = new System.Drawing.Size(201, 23);
             this.ButtonExtractData.TabIndex = 6;
-            this.ButtonExtractData.Text = "Test Parse";
+            this.ButtonExtractData.Text = "DEBUG : Test Parse and PDF one File";
             this.ButtonExtractData.UseVisualStyleBackColor = true;
-            this.ButtonExtractData.Click += new System.EventHandler(this.TestParseButton_Click);
             // 
             // label_location
             // 

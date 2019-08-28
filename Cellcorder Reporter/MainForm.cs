@@ -26,7 +26,10 @@ namespace Cellcorder_Reporter
         {
             csv_TextBox.Text = UI.GetCsvFolderLocation().Trim();
             if (csv_TextBox.Text != "")
+            {
+                GlobalData.allTestReadings = new Dictionary<string, TestResult>();  // reset this for new data
                 UI.ShowListInGrid(csv_TextBox.Text);
+            }
         }
 
 
@@ -42,10 +45,11 @@ namespace Cellcorder_Reporter
         //---------------------------------------------------------------------
         // Parsing test button handler
         //---------------------------------------------------------------------
-        private void TestParseButton_Click(object sender, EventArgs e)
-        {
-           UI.ProcessParseButtonClick(@"C:\_Work Related_\Work History\Repsol\Saltire\2017\Saltire - April 2017\Cellcorder Results\CSV\7530D1D2.csv");
-        }
+        //private void TestParseButton_Click(object sender, EventArgs e)
+        //{
+        //    // need to grab the file list and pass that to the parsing method
+        //   //UI.ProcessParseButtonClick(@"C:\_Work Related_\Work History\Repsol\Saltire\2017\Saltire - April 2017\Cellcorder Results\CSV\7530D1D2.csv");
+        //}
 
         private void datagrid_testResults_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {

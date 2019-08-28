@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
 namespace Cellcorder_Reporter
 {
@@ -36,7 +37,6 @@ namespace Cellcorder_Reporter
             browserDialogue = null;
 
             // save this path in the global data structure
-            Console.WriteLine(csvFolderLocation);
             GlobalData.csvStoragePath = csvFolderLocation;
             //return csvFolderLocation;
             return @"C:\_Current Projects\C#\Work CSV Reporting - OLD\CSV Files"; // DEBUGGING
@@ -46,9 +46,40 @@ namespace Cellcorder_Reporter
         //---------------------------------------------------------------------
         // get the list of filenames in the specified folder
         //---------------------------------------------------------------------
-        public static Array FileListArray(string _path)
+        public static List<string> FileListArray(string _path)
         {
-            return Directory.GetFiles(_path, "*.CSV");
+            // need to ensre that the files are valid when returning the list to include
+            // takes a bit longer but its probably best to do it here before going any further
+
+            List<String> invalidFiles = new List<string>();  // records invalid files
+            List<String> validFileList = new List<string>();
+
+            foreach (string item in Directory.GetFiles(_path, "*.CSV"))
+            {
+                try
+                {
+                    using (StreamReader reader = new StreamReader(File.OpenRead(item)))
+                    {
+                        // if all goes well, add to list and should dispose after opening
+                        validFileList.Add(item);
+                    }
+                }
+                catch (IOException)
+                {
+                    // if it cannot open the file, warn user and dont add to valid list of files
+                    invalidFiles.Add(Path.GetFileNameWithoutExtension(item) + "\n");
+                    Console.WriteLine( "Thrown from FileListArray : " + Path.GetFileNameWithoutExtension(item));
+                }
+
+            }
+
+            if (invalidFiles.Count > 0)
+            {
+                invalidFiles.Insert(0, "The following files cannot be accessed, either they are open or invalid.\n\n");
+                invalidFiles.Add("\n\nCheck these files and reselect folder with browse button.");
+                MessageBox.Show(string.Join<string>("", invalidFiles), "File Processing error..",MessageBoxButtons.OK,MessageBoxIcon.Warning);
+            }
+            return validFileList;
         }
 
         //---------------------------------------------------------------------
@@ -60,15 +91,41 @@ namespace Cellcorder_Reporter
             // reset the datagrid view to blank it by clearing rows
             if (form.FileList_DataGrid.Rows.Count > 0)
                 form.FileList_DataGrid.Rows.Clear();
+
+            List<string> errorList = new List<string>();
+            
+
             foreach (string item in FileListArray(_path))
             {
-                form.FileList_DataGrid.Rows.Add(
+                // try to parse each one as it is added and capture any errors here.
+                try
+                {
+                    TestResult tempResult =  Parser.ParseCSV(item);
+                    GlobalData.allTestReadings.Add(Path.GetFileNameWithoutExtension(item), tempResult);
+
+                    form.FileList_DataGrid.Rows.Add(
                     true,
                     Path.GetFileNameWithoutExtension(item),
-                    "Show Data"
+                    "Review Data"
                     );
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("thrown from parsing and ShowListInGrid: " + Path.GetFileNameWithoutExtension(item));
+                    errorList.Add(Path.GetFileNameWithoutExtension(item));
+                } 
             }
 
+            if(errorList.Count > 0)
+            {
+                errorList.Insert(0,"The following files are in the incorrect format and can not be read.\n\n");
+                errorList.Add("\n\nCheck these files if required and reselect folder with browse button.");
+                // show any errors as a message box
+                MessageBox.Show(string.Join<string>("", errorList),
+                    "File Formatting error..", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+            Console.WriteLine("count of all test readings : " + GlobalData.allTestReadings.Count);
             //---------------------------------------------------------------------
             // Set all the lines to a faint green if checked, then later
             // we can set to a dark lime once they have been checked
@@ -118,46 +175,13 @@ namespace Cellcorder_Reporter
         }
 
 
-        //---------------------------------------------------------------------
-        //    handle the test parse button click
-        //---------------------------------------------------------------------
-        public static void ProcessParseButtonClick(String _fileToParse)
-        {
-            //TODO : check to see if any of the files are open before going through this.
-            try
-            {
-                TestResult tempResult = Parser.ParseCSV(_fileToParse);
-
-                //Console.WriteLine("File : " + tempResult.fileName);
-                //Console.WriteLine("Date Created : " + tempResult.dateFileCreated);
-                //Console.WriteLine("Location : " + tempResult.location);
-                //Console.WriteLine("Battery Name : " + tempResult.batteryName);
-                //Console.WriteLine("Total strings : " + tempResult.totalStrings);
-                //Console.WriteLine("Model no : " + tempResult.modelNumber);
-                //Console.WriteLine("install date : " + tempResult.installDate);
-                //Console.WriteLine("Temperature scale : " + tempResult.temperatureScale.ToString());
-                //Console.WriteLine("highVoltage_threshold : " + tempResult.highVoltage_threshold);
-                //Console.WriteLine("lowVoltage_threshold : " + tempResult.lowVoltage_threshold);
-                //Console.WriteLine("highResistance_threshold : " + tempResult.highResistance_threshold);
-                //Console.WriteLine("lowResistance_threshold : " + tempResult.lowResistance_threshold);
-                //Console.WriteLine("highInterCell1_threshold : " + tempResult.highInterCell1_threshold);
-                //Console.WriteLine("highInterCell2_threshold : " + tempResult.highInterCell2_threshold);
-                //Console.WriteLine("highInterCell3_threshold : " + tempResult.highInterCell3_threshold);
-                //Console.WriteLine("highInterCell4_threshold : " + tempResult.highInterCell4_threshold);
-                //Console.WriteLine("Overall Voltage : " + tempResult.GetOverallFloatVoltage());
-                //CellReading maxR = tempResult.GetMaxResistance();
-                //Console.WriteLine("Max resistance : String : " + maxR.stringNumber + " on Cell : " + maxR.cellNumber + " of : " + maxR.resistance);
-                //CellReading minR = tempResult.GetMinResistance();
-                //Console.WriteLine("Min resistance : String : " + minR.stringNumber + " on Cell : " + minR.cellNumber + " of : " + minR.resistance);
-                //CellReading maxV = tempResult.GetMaxFloat();
-                //Console.WriteLine("maxV voltage : String : " + maxV.stringNumber + " on Cell : " + maxV.cellNumber + " of : " + maxV.floatVoltage);
-            }
-            catch (IOException)
-            {
-                Console.WriteLine(" Cannot process file : " + _fileToParse.ToString() + " as it is in use, close this file and try agnain!");
-            }
-
-        }
+        ////---------------------------------------------------------------------
+        ////    handle the test parse button click
+        ////---------------------------------------------------------------------
+        //public static TestResult ProcessParsing(String _fileToParse)
+        //{
+        //        TestResult tempResult = Parser.ParseCSV(_fileToParse);
+        //}
 
        
     }

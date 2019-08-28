@@ -140,7 +140,7 @@ namespace Cellcorder_Reporter
                         // ok so if there is any blank lines on the next check, just break out as its done
                         if (streamedLine == "")
                         {
-                            Console.WriteLine("End of file reached. get outta here....");
+                            //Console.WriteLine("End of file reached. get outta here....");
                             break;
                         }
                         currentReadLine = streamedLine.Split(',');
@@ -160,7 +160,7 @@ namespace Cellcorder_Reporter
                 }
                 else if (currentResult.totalStrings == 1)
                 {
-                    Console.WriteLine("one string and File : " + _CSVFileToParse);
+                    //Console.WriteLine("one string and File : " + _CSVFileToParse);
                     while (!reader.EndOfStream)
                     {
                         CellReading currentCellData = new CellReading();
@@ -170,7 +170,7 @@ namespace Cellcorder_Reporter
                         // ok so if there is any blank lines on the next check, just break out as its done
                         if (streamedLine == "")
                         {
-                            Console.WriteLine("End of file reached. get outta here....");
+                            //Console.WriteLine("End of file reached. get outta here....");
                             break;
                         }
                         currentReadLine = streamedLine.Split(',');
