@@ -41,7 +41,7 @@ namespace Cellcorder_Reporter
     {
         public TestResult()
         {
-            Reading = new List<CellReading>();
+            cellReadingsList = new List<CellReading>();
             location = "";
             batteryName = "";
             modelNumber = "";
@@ -72,7 +72,7 @@ namespace Cellcorder_Reporter
         public int          highSG_threshold;
         public int          lowSG_threshold;
         public TempScale    temperatureScale;
-        public List<CellReading> Reading;
+        public List<CellReading> cellReadingsList;
         public string       comments;   // used in conjunction with data review comments
 
 
@@ -82,27 +82,27 @@ namespace Cellcorder_Reporter
 
         public CellReading GetMaxResistance()
         {
-            CellReading maxObject = Reading.OrderByDescending(item => item.resistance).First();
+            CellReading maxObject = cellReadingsList.OrderByDescending(item => item.resistance).First();
             return maxObject;
         }
 
         public CellReading GetMinResistance()
         {
-            CellReading minObject = Reading.OrderByDescending(item => item.resistance).Last();
+            CellReading minObject = cellReadingsList.OrderByDescending(item => item.resistance).Last();
             return minObject;
         }
 
         // method to return the max float voltage of system
         public CellReading GetMaxFloat()
         {
-            CellReading maxObject = Reading.OrderByDescending(item => item.floatVoltage).First();
+            CellReading maxObject = cellReadingsList.OrderByDescending(item => item.floatVoltage).First();
             return maxObject;
         }
 
         // method to return the minimum float voltage reading of system
         public CellReading GetMinFloat()
         {
-            CellReading minObject = Reading.OrderByDescending(item => item.floatVoltage).Last();
+            CellReading minObject = cellReadingsList.OrderByDescending(item => item.floatVoltage).Last();
             return minObject;
         }
 
@@ -110,11 +110,18 @@ namespace Cellcorder_Reporter
         public float GetOverallFloatVoltage()
         {
             float totalVolts = 0f;
-            foreach (CellReading cell in Reading.Where(val => val.stringNumber == 1))
+            foreach (CellReading cell in cellReadingsList.Where(val => val.stringNumber == 1))
             {
                 totalVolts += cell.floatVoltage;
             }
             return totalVolts;
+        }
+
+        // method to get the highest number of cells in a string
+        public int GetMaxCellsInStrings()
+        {
+            CellReading maxObject = cellReadingsList.OrderByDescending(item => item.cellNumber).First();
+            return maxObject.cellNumber;
         }
 
 

@@ -156,6 +156,7 @@ namespace Cellcorder_Reporter
             {
                 DataGridViewRow row = senderGrid.Rows[e.RowIndex]; // set clicked row
 
+                // process the clicks on the checkbox column
                 if (e.ColumnIndex == 0)  // so if this is the checkbox column on that row
                 {
                     DataGridViewCheckBoxCell cell = (DataGridViewCheckBoxCell)row.Cells[0];
@@ -171,18 +172,103 @@ namespace Cellcorder_Reporter
                     }
                 }
 
+                // process the clicks on the preview button column
+                if(e.ColumnIndex == 2)
+                {
+                    DataGridViewButtonCell butCell = (DataGridViewButtonCell)row.Cells[2];
+                    //string fileToShow = senderGrid.Columns[1].Row[e.RowIndex]
+                    string fileToExamine =  senderGrid.Rows[e.RowIndex].Cells[1].Value.ToString();
+                    // now fire this off to another method to display it in the grid.
+                    PreviewFile(fileToExamine);
+                }
+
+                // now to handle what button is pressed and display the data in the other datagrid for previewing
+
+
             }
         }
 
+        //---------------------------------------------------------------------
+        //    show preview data in preview datagrid
+        //---------------------------------------------------------------------
+        public static void PreviewFile(string _fileName)
+        {
+            // get the dict entry for the dataset
+            TestResult resultSet = GlobalData.allTestReadings[_fileName];
+            GlobalData.mainFormRef.Location_text.Text = resultSet.location;
+            GlobalData.mainFormRef.Battery_text.Text = resultSet.batteryName;
+            GlobalData.mainFormRef.dateTested_text.Text = resultSet.dateFileCreated.ToString("dd / MM / yyyy");
+            GlobalData.mainFormRef.Strings_text.Text = resultSet.totalStrings.ToString();
+            GlobalData.mainFormRef.CellCount_text.Text = resultSet.GetMaxCellsInStrings().ToString();
+            GlobalData.mainFormRef.tag_text.Text = _fileName;
 
-        ////---------------------------------------------------------------------
-        ////    handle the test parse button click
-        ////---------------------------------------------------------------------
-        //public static TestResult ProcessParsing(String _fileToParse)
-        //{
-        //        TestResult tempResult = Parser.ParseCSV(_fileToParse);
-        //}
+            // need to clear the datagridview ready for repopulating
+            if (GlobalData.mainFormRef.testResults_DataGrid.Rows.Count > 0)
+                GlobalData.mainFormRef.testResults_DataGrid.Rows.Clear();
 
-       
+
+            // heres the color definitions rather than hard coding in loads of places.
+            Color lowColor = Color.Yellow;
+            Color highColor = Color.Red;
+
+            // going to use a string index counter here, just so that if the string changes to a 2 i can add a separator line.
+            int stringIndexCounter = 1;
+
+            // populate the datagrid with the cell results
+            foreach (CellReading reading in resultSet.cellReadingsList)
+            {
+                // add a blank line if the current string index is incremented (so different to stringIndexCounter)
+                if (reading.stringNumber > stringIndexCounter)
+                {
+                    // add a blank row and increment string index counter
+                    DataGridViewRow BlankRow = new DataGridViewRow();
+                    GlobalData.mainFormRef.testResults_DataGrid.Rows.Add(BlankRow);
+                    stringIndexCounter++;
+                }
+                // declare row > populate > and add it to datagrid
+                DataGridViewRow row = new DataGridViewRow();
+                row.CreateCells(GlobalData.mainFormRef.testResults_DataGrid);
+                // as goes through check the values agains the thresholds set via cellcorder
+                row.Cells[0].Value = reading.stringNumber;
+                row.Cells[1].Value = reading.cellNumber;
+
+                // get the float voltage and check against thresholds
+                row.Cells[2].Value = reading.floatVoltage.ToString("####0.00");
+                if (reading.floatVoltage <= resultSet.lowVoltage_threshold)
+                    row.Cells[2].Style.BackColor = lowColor;
+                else if (reading.floatVoltage >= resultSet.highVoltage_threshold)
+                    row.Cells[2].Style.BackColor = highColor;
+
+                // get the resistance and check check against thresholds
+                row.Cells[3].Value = reading.resistance;
+                if (reading.resistance <= resultSet.lowResistance_threshold)
+                    row.Cells[3].Style.BackColor = lowColor;
+                else if (reading.resistance >= resultSet.highResistance_threshold)
+                    row.Cells[3].Style.BackColor = highColor;
+
+                // get the intertier resistance and check against thresholds
+                row.Cells[4].Value = reading.interCell_1_Resistance;
+                if (reading.interCell_1_Resistance >= resultSet.highInterCell1_threshold && resultSet.highInterCell1_threshold !=0)
+                    row.Cells[4].Style.BackColor = highColor;
+
+                // get the intertier resistance and check against thresholds
+                row.Cells[5].Value = reading.interCell_2_Resistance;
+                if (reading.interCell_2_Resistance >= resultSet.highInterCell2_threshold && resultSet.highInterCell2_threshold != 0)
+                    row.Cells[5].Style.BackColor = highColor;
+
+                // get the intertier resistance and check against thresholds
+                row.Cells[6].Value = reading.interCell_3_Resistance;
+                if (reading.interCell_3_Resistance >= resultSet.highInterCell3_threshold && resultSet.highInterCell3_threshold != 0)
+                    row.Cells[6].Style.BackColor = highColor;
+
+                // get the intertier resistance and check against thresholds
+                row.Cells[7].Value = reading.interCell_4_Resistance;
+                if (reading.interCell_4_Resistance >= resultSet.highInterCell4_threshold && resultSet.highInterCell4_threshold != 0)
+                    row.Cells[7].Style.BackColor = highColor;
+
+                row.Cells[8].Value = reading.specificGravity;
+                GlobalData.mainFormRef.testResults_DataGrid.Rows.Add(row);
+            }
+        }
     }
 }

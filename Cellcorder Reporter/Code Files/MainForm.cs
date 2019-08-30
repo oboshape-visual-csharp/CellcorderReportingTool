@@ -38,7 +38,16 @@ namespace Cellcorder_Reporter
         //---------------------------------------------------------------------
         private void FileList_DataGrid_CellClick(object sender, DataGridViewCellEventArgs e)
         {
+            if(e.RowIndex >= 0) // just to diable clicking on the header having any effect
             UI.ProcessDataGridClicks(sender, e);
+        }
+
+        private void main_Form_Load(object sender, EventArgs e)
+        {
+            // set some of the global references
+            GlobalData.fileListDGV = FileList_DataGrid;
+            GlobalData.previewDataDGV = testResults_DataGrid;
+            GlobalData.mainFormRef = this;
         }
 
 
@@ -51,9 +60,5 @@ namespace Cellcorder_Reporter
         //   //UI.ProcessParseButtonClick(@"C:\_Work Related_\Work History\Repsol\Saltire\2017\Saltire - April 2017\Cellcorder Results\CSV\7530D1D2.csv");
         //}
 
-        private void datagrid_testResults_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
     }
 }

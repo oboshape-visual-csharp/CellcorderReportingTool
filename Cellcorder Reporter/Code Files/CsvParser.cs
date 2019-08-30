@@ -155,7 +155,7 @@ namespace Cellcorder_Reporter
                         currentCellData.interCell_4_Resistance = Convert.ToInt16(currentReadLine[15]);
                         currentCellData.specificGravity = Convert.ToInt16(currentReadLine[17]);
                         currentCellData.temperature = Convert.ToInt16(currentReadLine[19]);
-                        currentResult.Reading.Add(currentCellData);
+                        currentResult.cellReadingsList.Add(currentCellData);
                     }
                 }
                 else if (currentResult.totalStrings == 1)
@@ -185,7 +185,7 @@ namespace Cellcorder_Reporter
                         currentCellData.interCell_4_Resistance = Convert.ToInt16(currentReadLine[13]);
                         currentCellData.specificGravity = Convert.ToInt16(currentReadLine[15]);
                         currentCellData.temperature = Convert.ToInt16(currentReadLine[17]);
-                        currentResult.Reading.Add(currentCellData);
+                        currentResult.cellReadingsList.Add(currentCellData);
                     }
 
                 }
