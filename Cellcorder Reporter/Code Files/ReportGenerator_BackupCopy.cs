@@ -21,13 +21,11 @@ namespace Cellcorder_Reporter
         public static void CreatePDFReport(string forTesting) // string fileName   removed for testing, put back in
         {
             string fileName = "7530D1D2_2string";
-            // Create the MigraDoc document this will populate the contents
+            Console.WriteLine(fileName);
+            // Create a MigraDoc document
             Document document = CreateDocument();
-            // define the pdf renderer object
             PdfDocumentRenderer renderer = new PdfDocumentRenderer();
-            // define the document to render
             renderer.Document = document;
-            // render out the pdf document
             renderer.RenderDocument();
 
             // Save the document with the date and time on end of string...
@@ -38,10 +36,6 @@ namespace Cellcorder_Reporter
 
             renderer.Save(fileToSave);
         }
-
-        //---------------------------------------------------------------------
-        // this will create the document and populate all the content of it
-        //---------------------------------------------------------------------
 
         public static Document CreateDocument()
         {

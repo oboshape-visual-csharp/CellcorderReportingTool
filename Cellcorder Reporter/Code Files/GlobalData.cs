@@ -25,5 +25,7 @@ namespace Cellcorder_Reporter
 
         // storage for all the test readings in a dictionary for easy access
         public static Dictionary<string, TestResult> allTestReadings = new Dictionary<string, TestResult>();
+
+        public static string currentlyViewingFile = "";
     }
 }

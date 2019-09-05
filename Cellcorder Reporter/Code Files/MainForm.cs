@@ -42,6 +42,8 @@ namespace Cellcorder_Reporter
             UI.ProcessDataGridClicks(sender, e);
         }
 
+
+
         private void main_Form_Load(object sender, EventArgs e)
         {
             // set some of the global references
@@ -50,15 +52,36 @@ namespace Cellcorder_Reporter
             GlobalData.mainFormRef = this;
         }
 
+        //---------------------------------------------------------------------
+        // view and modify the currently visible test reading thresholds
+        //---------------------------------------------------------------------
+        private void button_EditThresholds_Click(object sender, EventArgs e)
+        {
+            // open the thresholds form
+            ViewEditThresholds thresholdsForm = new ViewEditThresholds();
+            thresholdsForm.ShowDialog();
+            // refresh the data on the preview grid
+            UI.PreviewFile(GlobalData.currentlyViewingFile);
+        }
+
 
         //---------------------------------------------------------------------
-        // Parsing test button handler
+        // view and modify the currently visible test reading thresholds
         //---------------------------------------------------------------------
-        //private void TestParseButton_Click(object sender, EventArgs e)
-        //{
-        //    // need to grab the file list and pass that to the parsing method
-        //   //UI.ProcessParseButtonClick(@"C:\_Work Related_\Work History\Repsol\Saltire\2017\Saltire - April 2017\Cellcorder Results\CSV\7530D1D2.csv");
-        //}
+        private void SaveComments_button_Click(object sender, EventArgs e)
+        {
+            GlobalData.allTestReadings[GlobalData.currentlyViewingFile].comments = Comments_textBox.Text.Trim();
+        }
+
+
+
+
+        // testing the PDF creation
+        private void TestPDF_button_Click(object sender, EventArgs e)
+        {
+            Console.WriteLine(GlobalData.currentlyViewingFile);
+            CellcorderReporting.CreatePDFReport(GlobalData.currentlyViewingFile);
+        }
 
     }
 }

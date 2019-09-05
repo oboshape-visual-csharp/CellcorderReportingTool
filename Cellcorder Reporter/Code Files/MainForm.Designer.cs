@@ -57,30 +57,42 @@
             this.col_Icr3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.col_Icr4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.col_SG = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Temp = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.progressBar_Label = new System.Windows.Forms.Label();
             this.tag_text = new System.Windows.Forms.Label();
             this.label_Tag = new System.Windows.Forms.Label();
             this.groupbox_DataPreview = new System.Windows.Forms.GroupBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.SaveComments_button = new System.Windows.Forms.Button();
+            this.groupBox_comments = new System.Windows.Forms.GroupBox();
+            this.Comments_textBox = new System.Windows.Forms.TextBox();
+            this.button_EditThresholds = new System.Windows.Forms.Button();
             this.groupBox_fileListing = new System.Windows.Forms.GroupBox();
+            this.TestPDF_button = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.FileList_DataGrid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.testResults_DataGrid)).BeginInit();
             this.groupbox_DataPreview.SuspendLayout();
+            this.groupBox_comments.SuspendLayout();
             this.groupBox_fileListing.SuspendLayout();
             this.SuspendLayout();
             // 
             // csv_TextBox
             // 
-            this.csv_TextBox.Location = new System.Drawing.Point(52, 68);
+            this.csv_TextBox.Location = new System.Drawing.Point(49, 44);
             this.csv_TextBox.Name = "csv_TextBox";
             this.csv_TextBox.ReadOnly = true;
+            this.csv_TextBox.ShortcutsEnabled = false;
             this.csv_TextBox.Size = new System.Drawing.Size(242, 20);
             this.csv_TextBox.TabIndex = 0;
             this.csv_TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // browseForCsv_Button
             // 
-            this.browseForCsv_Button.Location = new System.Drawing.Point(300, 68);
+            this.browseForCsv_Button.Location = new System.Drawing.Point(297, 44);
             this.browseForCsv_Button.Name = "browseForCsv_Button";
             this.browseForCsv_Button.Size = new System.Drawing.Size(75, 23);
             this.browseForCsv_Button.TabIndex = 1;
@@ -91,7 +103,7 @@
             // SelectCsvFolder_label
             // 
             this.SelectCsvFolder_label.BackColor = System.Drawing.Color.Transparent;
-            this.SelectCsvFolder_label.Location = new System.Drawing.Point(52, 52);
+            this.SelectCsvFolder_label.Location = new System.Drawing.Point(49, 28);
             this.SelectCsvFolder_label.Name = "SelectCsvFolder_label";
             this.SelectCsvFolder_label.Size = new System.Drawing.Size(265, 13);
             this.SelectCsvFolder_label.TabIndex = 2;
@@ -149,11 +161,11 @@
             // 
             // ButtonExtractData
             // 
-            this.ButtonExtractData.Location = new System.Drawing.Point(70, 523);
+            this.ButtonExtractData.Location = new System.Drawing.Point(90, 553);
             this.ButtonExtractData.Name = "ButtonExtractData";
             this.ButtonExtractData.Size = new System.Drawing.Size(201, 23);
             this.ButtonExtractData.TabIndex = 6;
-            this.ButtonExtractData.Text = "DEBUG : Test Parse and PDF one File";
+            this.ButtonExtractData.Text = "Generate Selected PDF Reports";
             this.ButtonExtractData.UseVisualStyleBackColor = true;
             // 
             // label_location
@@ -263,14 +275,15 @@
             this.col_Icr2,
             this.col_Icr3,
             this.col_Icr4,
-            this.col_SG});
+            this.col_SG,
+            this.Temp});
             this.testResults_DataGrid.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-            this.testResults_DataGrid.Location = new System.Drawing.Point(44, 103);
+            this.testResults_DataGrid.Location = new System.Drawing.Point(40, 131);
             this.testResults_DataGrid.Name = "testResults_DataGrid";
             this.testResults_DataGrid.ReadOnly = true;
             this.testResults_DataGrid.RowHeadersVisible = false;
             this.testResults_DataGrid.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.testResults_DataGrid.Size = new System.Drawing.Size(432, 311);
+            this.testResults_DataGrid.Size = new System.Drawing.Size(536, 311);
             this.testResults_DataGrid.TabIndex = 17;
             // 
             // col_StringNumber
@@ -278,6 +291,8 @@
             this.col_StringNumber.HeaderText = "String";
             this.col_StringNumber.Name = "col_StringNumber";
             this.col_StringNumber.ReadOnly = true;
+            this.col_StringNumber.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.col_StringNumber.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.col_StringNumber.Width = 45;
             // 
             // col_CellNumber
@@ -285,6 +300,8 @@
             this.col_CellNumber.HeaderText = "Cell";
             this.col_CellNumber.Name = "col_CellNumber";
             this.col_CellNumber.ReadOnly = true;
+            this.col_CellNumber.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.col_CellNumber.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.col_CellNumber.Width = 45;
             // 
             // col_Volts
@@ -292,6 +309,8 @@
             this.col_Volts.HeaderText = "Volts";
             this.col_Volts.Name = "col_Volts";
             this.col_Volts.ReadOnly = true;
+            this.col_Volts.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.col_Volts.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.col_Volts.Width = 45;
             // 
             // col_Resistance
@@ -299,6 +318,8 @@
             this.col_Resistance.HeaderText = "Res";
             this.col_Resistance.Name = "col_Resistance";
             this.col_Resistance.ReadOnly = true;
+            this.col_Resistance.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.col_Resistance.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.col_Resistance.Width = 45;
             // 
             // col_Icr1
@@ -306,6 +327,8 @@
             this.col_Icr1.HeaderText = "ICR1";
             this.col_Icr1.Name = "col_Icr1";
             this.col_Icr1.ReadOnly = true;
+            this.col_Icr1.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.col_Icr1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.col_Icr1.Width = 45;
             // 
             // col_Icr2
@@ -313,6 +336,8 @@
             this.col_Icr2.HeaderText = "ICR2";
             this.col_Icr2.Name = "col_Icr2";
             this.col_Icr2.ReadOnly = true;
+            this.col_Icr2.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.col_Icr2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.col_Icr2.Width = 45;
             // 
             // col_Icr3
@@ -320,6 +345,8 @@
             this.col_Icr3.HeaderText = "ICR3";
             this.col_Icr3.Name = "col_Icr3";
             this.col_Icr3.ReadOnly = true;
+            this.col_Icr3.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.col_Icr3.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.col_Icr3.Width = 45;
             // 
             // col_Icr4
@@ -327,6 +354,8 @@
             this.col_Icr4.HeaderText = "ICR4";
             this.col_Icr4.Name = "col_Icr4";
             this.col_Icr4.ReadOnly = true;
+            this.col_Icr4.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.col_Icr4.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.col_Icr4.Width = 45;
             // 
             // col_SG
@@ -334,12 +363,22 @@
             this.col_SG.HeaderText = "SG";
             this.col_SG.Name = "col_SG";
             this.col_SG.ReadOnly = true;
+            this.col_SG.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.col_SG.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.col_SG.Width = 45;
+            // 
+            // Temp
+            // 
+            this.Temp.HeaderText = "temperature";
+            this.Temp.Name = "Temp";
+            this.Temp.ReadOnly = true;
+            this.Temp.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Temp.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // progressBar
             // 
             this.progressBar.ForeColor = System.Drawing.Color.LimeGreen;
-            this.progressBar.Location = new System.Drawing.Point(400, 530);
+            this.progressBar.Location = new System.Drawing.Point(13, 605);
             this.progressBar.Name = "progressBar";
             this.progressBar.Size = new System.Drawing.Size(369, 23);
             this.progressBar.TabIndex = 18;
@@ -348,11 +387,11 @@
             // 
             this.progressBar_Label.BackColor = System.Drawing.Color.Transparent;
             this.progressBar_Label.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.progressBar_Label.Location = new System.Drawing.Point(397, 504);
+            this.progressBar_Label.Location = new System.Drawing.Point(10, 579);
             this.progressBar_Label.Name = "progressBar_Label";
             this.progressBar_Label.Size = new System.Drawing.Size(372, 23);
             this.progressBar_Label.TabIndex = 19;
-            this.progressBar_Label.Text = "Task that is being progresed";
+            this.progressBar_Label.Text = "PDF Creation Progress...";
             this.progressBar_Label.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // tag_text
@@ -376,6 +415,13 @@
             // groupbox_DataPreview
             // 
             this.groupbox_DataPreview.BackColor = System.Drawing.Color.White;
+            this.groupbox_DataPreview.Controls.Add(this.label3);
+            this.groupbox_DataPreview.Controls.Add(this.label4);
+            this.groupbox_DataPreview.Controls.Add(this.label2);
+            this.groupbox_DataPreview.Controls.Add(this.label1);
+            this.groupbox_DataPreview.Controls.Add(this.SaveComments_button);
+            this.groupbox_DataPreview.Controls.Add(this.groupBox_comments);
+            this.groupbox_DataPreview.Controls.Add(this.button_EditThresholds);
             this.groupbox_DataPreview.Controls.Add(this.tag_text);
             this.groupbox_DataPreview.Controls.Add(this.label_Tag);
             this.groupbox_DataPreview.Controls.Add(this.testResults_DataGrid);
@@ -391,10 +437,88 @@
             this.groupbox_DataPreview.Controls.Add(this.label_location);
             this.groupbox_DataPreview.Location = new System.Drawing.Point(415, 28);
             this.groupbox_DataPreview.Name = "groupbox_DataPreview";
-            this.groupbox_DataPreview.Size = new System.Drawing.Size(504, 444);
+            this.groupbox_DataPreview.Size = new System.Drawing.Size(596, 626);
             this.groupbox_DataPreview.TabIndex = 22;
             this.groupbox_DataPreview.TabStop = false;
             this.groupbox_DataPreview.Text = "Review Test Data";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.BackColor = System.Drawing.Color.Red;
+            this.label3.Location = new System.Drawing.Point(520, 70);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(61, 13);
+            this.label3.TabIndex = 24;
+            this.label3.Text = "                  ";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.BackColor = System.Drawing.Color.Yellow;
+            this.label4.Location = new System.Drawing.Point(520, 35);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(61, 13);
+            this.label4.TabIndex = 25;
+            this.label4.Text = "                  ";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(520, 22);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(56, 13);
+            this.label2.TabIndex = 28;
+            this.label2.Text = "Low Warn";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(520, 57);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(58, 13);
+            this.label1.TabIndex = 27;
+            this.label1.Text = "High Warn";
+            // 
+            // SaveComments_button
+            // 
+            this.SaveComments_button.Enabled = false;
+            this.SaveComments_button.Location = new System.Drawing.Point(195, 597);
+            this.SaveComments_button.Name = "SaveComments_button";
+            this.SaveComments_button.Size = new System.Drawing.Size(149, 23);
+            this.SaveComments_button.TabIndex = 26;
+            this.SaveComments_button.Text = "Save Comments";
+            this.SaveComments_button.UseVisualStyleBackColor = true;
+            this.SaveComments_button.Click += new System.EventHandler(this.SaveComments_button_Click);
+            // 
+            // groupBox_comments
+            // 
+            this.groupBox_comments.Controls.Add(this.Comments_textBox);
+            this.groupBox_comments.Location = new System.Drawing.Point(24, 477);
+            this.groupBox_comments.Name = "groupBox_comments";
+            this.groupBox_comments.Size = new System.Drawing.Size(566, 114);
+            this.groupBox_comments.TabIndex = 25;
+            this.groupBox_comments.TabStop = false;
+            this.groupBox_comments.Text = "Enter\\Edit comments and press Save Button";
+            // 
+            // Comments_textBox
+            // 
+            this.Comments_textBox.Location = new System.Drawing.Point(16, 20);
+            this.Comments_textBox.Multiline = true;
+            this.Comments_textBox.Name = "Comments_textBox";
+            this.Comments_textBox.Size = new System.Drawing.Size(536, 84);
+            this.Comments_textBox.TabIndex = 0;
+            // 
+            // button_EditThresholds
+            // 
+            this.button_EditThresholds.Enabled = false;
+            this.button_EditThresholds.Location = new System.Drawing.Point(195, 448);
+            this.button_EditThresholds.Name = "button_EditThresholds";
+            this.button_EditThresholds.Size = new System.Drawing.Size(149, 23);
+            this.button_EditThresholds.TabIndex = 24;
+            this.button_EditThresholds.Text = "Edit Test Thresholds";
+            this.button_EditThresholds.UseVisualStyleBackColor = true;
+            this.button_EditThresholds.Click += new System.EventHandler(this.button_EditThresholds_Click);
             // 
             // groupBox_fileListing
             // 
@@ -406,12 +530,23 @@
             this.groupBox_fileListing.TabStop = false;
             this.groupBox_fileListing.Text = "CSV Test Files (Uncheck Files that are not to be reported on)";
             // 
+            // TestPDF_button
+            // 
+            this.TestPDF_button.Location = new System.Drawing.Point(169, 491);
+            this.TestPDF_button.Name = "TestPDF_button";
+            this.TestPDF_button.Size = new System.Drawing.Size(75, 23);
+            this.TestPDF_button.TabIndex = 24;
+            this.TestPDF_button.Text = "TEST PDF";
+            this.TestPDF_button.UseVisualStyleBackColor = true;
+            this.TestPDF_button.Click += new System.EventHandler(this.TestPDF_button_Click);
+            // 
             // main_Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(949, 558);
+            this.ClientSize = new System.Drawing.Size(1022, 666);
+            this.Controls.Add(this.TestPDF_button);
             this.Controls.Add(this.groupBox_fileListing);
             this.Controls.Add(this.groupbox_DataPreview);
             this.Controls.Add(this.progressBar_Label);
@@ -424,12 +559,15 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "main_Form";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Cellcorder Reporting Tool";
             this.Load += new System.EventHandler(this.main_Form_Load);
             ((System.ComponentModel.ISupportInitialize)(this.FileList_DataGrid)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.testResults_DataGrid)).EndInit();
             this.groupbox_DataPreview.ResumeLayout(false);
             this.groupbox_DataPreview.PerformLayout();
+            this.groupBox_comments.ResumeLayout(false);
+            this.groupBox_comments.PerformLayout();
             this.groupBox_fileListing.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -448,15 +586,6 @@
         private System.Windows.Forms.Label label_strings;
         private System.Windows.Forms.Label label_datetested;
         private System.Windows.Forms.Label label_cellcount;
-        private System.Windows.Forms.DataGridViewTextBoxColumn col_StringNumber;
-        private System.Windows.Forms.DataGridViewTextBoxColumn col_CellNumber;
-        private System.Windows.Forms.DataGridViewTextBoxColumn col_Volts;
-        private System.Windows.Forms.DataGridViewTextBoxColumn col_Resistance;
-        private System.Windows.Forms.DataGridViewTextBoxColumn col_Icr1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn col_Icr2;
-        private System.Windows.Forms.DataGridViewTextBoxColumn col_Icr3;
-        private System.Windows.Forms.DataGridViewTextBoxColumn col_Icr4;
-        private System.Windows.Forms.DataGridViewTextBoxColumn col_SG;
         private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.Label progressBar_Label;
         private System.Windows.Forms.DataGridViewCheckBoxColumn ColCheckBox;
@@ -472,6 +601,25 @@
         private System.Windows.Forms.Label label_Tag;
         private System.Windows.Forms.GroupBox groupbox_DataPreview;
         private System.Windows.Forms.GroupBox groupBox_fileListing;
+        private System.Windows.Forms.GroupBox groupBox_comments;
+        public System.Windows.Forms.TextBox Comments_textBox;
+        public System.Windows.Forms.Button SaveComments_button;
+        public System.Windows.Forms.Button button_EditThresholds;
+        private System.Windows.Forms.DataGridViewTextBoxColumn col_StringNumber;
+        private System.Windows.Forms.DataGridViewTextBoxColumn col_CellNumber;
+        private System.Windows.Forms.DataGridViewTextBoxColumn col_Volts;
+        private System.Windows.Forms.DataGridViewTextBoxColumn col_Resistance;
+        private System.Windows.Forms.DataGridViewTextBoxColumn col_Icr1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn col_Icr2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn col_Icr3;
+        private System.Windows.Forms.DataGridViewTextBoxColumn col_Icr4;
+        private System.Windows.Forms.DataGridViewTextBoxColumn col_SG;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Temp;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button TestPDF_button;
     }
 }
 

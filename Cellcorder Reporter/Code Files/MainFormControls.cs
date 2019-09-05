@@ -79,6 +79,13 @@ namespace Cellcorder_Reporter
                 invalidFiles.Add("\n\nCheck these files and reselect folder with browse button.");
                 MessageBox.Show(string.Join<string>("", invalidFiles), "File Processing error..",MessageBoxButtons.OK,MessageBoxIcon.Warning);
             }
+            
+
+            // if there are no valid files at this location
+            if(validFileList.Count ==0)
+            {
+                MessageBox.Show("\nNo valid CSV files at this location.\n" + _path + "\n\nPlease browse to another folder.", "Invalid folder selection..",MessageBoxButtons.OK,MessageBoxIcon.Error);
+            }
             return validFileList;
         }
 
@@ -92,11 +99,17 @@ namespace Cellcorder_Reporter
             if (form.FileList_DataGrid.Rows.Count > 0)
                 form.FileList_DataGrid.Rows.Clear();
 
+            // now disable the threshold editing and saving comments button, since the list has changed
+            GlobalData.mainFormRef.SaveComments_button.Enabled = false;
+            GlobalData.mainFormRef.button_EditThresholds.Enabled = false;
+            // set the filename in use flag thats in the global data to "" (nothing)
+            GlobalData.currentlyViewingFile = "";
+
             List<string> errorList = new List<string>();
             
 
             foreach (string item in FileListArray(_path))
-            {
+            { 
                 // try to parse each one as it is added and capture any errors here.
                 try
                 {
@@ -125,7 +138,6 @@ namespace Cellcorder_Reporter
                     "File Formatting error..", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
-            Console.WriteLine("count of all test readings : " + GlobalData.allTestReadings.Count);
             //---------------------------------------------------------------------
             // Set all the lines to a faint green if checked, then later
             // we can set to a dark lime once they have been checked
@@ -181,10 +193,6 @@ namespace Cellcorder_Reporter
                     // now fire this off to another method to display it in the grid.
                     PreviewFile(fileToExamine);
                 }
-
-                // now to handle what button is pressed and display the data in the other datagrid for previewing
-
-
             }
         }
 
@@ -201,6 +209,11 @@ namespace Cellcorder_Reporter
             GlobalData.mainFormRef.Strings_text.Text = resultSet.totalStrings.ToString();
             GlobalData.mainFormRef.CellCount_text.Text = resultSet.GetMaxCellsInStrings().ToString();
             GlobalData.mainFormRef.tag_text.Text = _fileName;
+
+            // set the currently viewing file reference
+            GlobalData.currentlyViewingFile = _fileName;
+            // display any test comments in the comments box
+            GlobalData.mainFormRef.Comments_textBox.Text = @resultSet.comments;
 
             // need to clear the datagridview ready for repopulating
             if (GlobalData.mainFormRef.testResults_DataGrid.Rows.Count > 0)
@@ -233,7 +246,7 @@ namespace Cellcorder_Reporter
                 row.Cells[1].Value = reading.cellNumber;
 
                 // get the float voltage and check against thresholds
-                row.Cells[2].Value = reading.floatVoltage.ToString("####0.00");
+                row.Cells[2].Value = reading.floatVoltage.ToString("0.000");
                 if (reading.floatVoltage <= resultSet.lowVoltage_threshold)
                     row.Cells[2].Style.BackColor = lowColor;
                 else if (reading.floatVoltage >= resultSet.highVoltage_threshold)
@@ -241,9 +254,9 @@ namespace Cellcorder_Reporter
 
                 // get the resistance and check check against thresholds
                 row.Cells[3].Value = reading.resistance;
-                if (reading.resistance <= resultSet.lowResistance_threshold)
+                if (reading.resistance <= resultSet.lowResistance_threshold && resultSet.lowResistance_threshold != 0)
                     row.Cells[3].Style.BackColor = lowColor;
-                else if (reading.resistance >= resultSet.highResistance_threshold)
+                else if (reading.resistance >= resultSet.highResistance_threshold && resultSet.highResistance_threshold != 0)
                     row.Cells[3].Style.BackColor = highColor;
 
                 // get the intertier resistance and check against thresholds
@@ -266,9 +279,27 @@ namespace Cellcorder_Reporter
                 if (reading.interCell_4_Resistance >= resultSet.highInterCell4_threshold && resultSet.highInterCell4_threshold != 0)
                     row.Cells[7].Style.BackColor = highColor;
 
+                // get the specific gravity
                 row.Cells[8].Value = reading.specificGravity;
+                if (reading.specificGravity <= resultSet.lowSG_threshold && resultSet.lowSG_threshold != 0 && resultSet.lowSG_threshold != resultSet.highSG_threshold)
+                    row.Cells[8].Style.BackColor = lowColor;
+                else if (reading.specificGravity >= resultSet.highSG_threshold && resultSet.highSG_threshold != 0 && resultSet.lowSG_threshold != resultSet.highSG_threshold)
+                    row.Cells[8].Style.BackColor = highColor;
+
+                // get the temperature
+                row.Cells[9].Value = reading.temperature;
+                if (reading.temperature <= resultSet.lowTemperature_threshold && resultSet.lowTemperature_threshold != 0 && resultSet.lowTemperature_threshold != resultSet.highTemperature_threshold)
+                    row.Cells[9].Style.BackColor = lowColor;
+                else if (reading.temperature >= resultSet.highTemperature_threshold && resultSet.highTemperature_threshold != 0 && resultSet.lowTemperature_threshold != resultSet.highTemperature_threshold)
+                    row.Cells[9].Style.BackColor = highColor;
+
+                // now insert this row object into the grid
                 GlobalData.mainFormRef.testResults_DataGrid.Rows.Add(row);
             }
+
+            // can enable the edit thresholds and save comments buttons at this point as data is displayed
+            GlobalData.mainFormRef.SaveComments_button.Enabled = true;
+            GlobalData.mainFormRef.button_EditThresholds.Enabled = true;
         }
     }
 }
