@@ -408,20 +408,25 @@ namespace Cellcorder_Reporter
             // create an array of all the battery cell voltages and cell numbers to use as values
             List<double> cellVoltageValues = new List<double>();
             List<string> cellXlabels = new List<string>();
-            //int currentStringNo = 1;
+
+            // depending on the number of cells, need to suss out a gap say every 10%
+            int xSpacing = (int)(currentResult.cellReadingsList.Count * 0.1);
 
             foreach (CellReading reading in currentResult.cellReadingsList)
             {
-                //// just to get a blank column to seperate strings on table
-                //if (reading.stringNumber > currentStringNo)
-                //{
-                //    currentStringNo++;
-                //    cellVoltageValues.Add(0);
-                //    cellXlabels.Add("");
-
-                //}
+                //add the resistance values to the table series
                 cellVoltageValues.Add(reading.floatVoltage);
-                cellXlabels.Add(reading.cellNumber.ToString());
+                // add the corresponding x labelling to the series, but try and space them out if theres alot 
+
+                if (reading.cellNumber % xSpacing == 0)
+                {
+                    cellXlabels.Add(reading.cellNumber.ToString());
+                    Console.WriteLine(reading.cellNumber.ToString());
+                }
+                else
+                {
+                    cellXlabels.Add("");
+                }
             }
 
             // now add the voltage data to the chart series
@@ -499,20 +504,25 @@ namespace Cellcorder_Reporter
             // create an array of all the battery cell voltages and cell numbers to use as values
             List<double> resistanceValuesList = new List<double>();
             List<string> cellXlabels = new List<string>();
-            //int currentStringNo = 1;
+
+            // depending on the number of cells, need to suss out a gap say every 10%
+            int xSpacing = (int)(currentResult.cellReadingsList.Count * 0.1);
 
             foreach (CellReading reading in currentResult.cellReadingsList)
             {
-                //// just to get a blank column to seperate strings on table
-                //if (reading.stringNumber > currentStringNo)
-                //{
-                //    currentStringNo++;
-                //    cellVoltageValues.Add(0);
-                //    cellXlabels.Add("");
-
-                //}
+                //add the resistance values to the table series
                 resistanceValuesList.Add(reading.resistance);
-                cellXlabels.Add(reading.cellNumber.ToString());
+                // add the corresponding x labelling to the series, but try and space them out if theres alot 
+
+                if(reading.cellNumber % xSpacing == 0)
+                {
+                    cellXlabels.Add(reading.cellNumber.ToString());
+                    Console.WriteLine(reading.cellNumber.ToString());
+                }
+                else
+                {
+                    cellXlabels.Add("");
+                }
             }
 
             // now add the voltage data to the chart series
