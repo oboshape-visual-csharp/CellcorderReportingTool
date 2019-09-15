@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
-
+using System.Drawing;
 
 namespace Cellcorder_Reporter
 {
@@ -35,6 +35,8 @@ namespace Cellcorder_Reporter
                 GlobalData.csvStoragePath = csv_TextBox.Text;
                 GlobalData.allTestReadings = new Dictionary<string, TestResult>();  // reset this for new data
                 UI.ShowListInGrid(csv_TextBox.Text);
+                // enable the create PDF button
+                ButtonCreateSelectedPDFs.Enabled = true;
             }
             else
             {
@@ -81,12 +83,29 @@ namespace Cellcorder_Reporter
         private void SaveComments_button_Click(object sender, EventArgs e)
         {
             GlobalData.allTestReadings[GlobalData.currentlyViewingFile].comments = Comments_textBox.Text.Trim();
+            SaveComments_button.BackColor = Color.Lime;
         }
 
 
         private void ButtonCreateSelectedPDFs_Click(object sender, EventArgs e)
         {
-           
+            // make sure that it goes no further if there are no files selected
+            // Get all the CSV files that are checked in the datagrid list view
+            List<string> filesToProcess = new List<string>();
+            FileList_DataGrid.Rows.OfType<DataGridViewRow>().ToList<DataGridViewRow>().ForEach(
+                row =>
+                {
+                    if ((bool)row.Cells[0].Value == true)
+                    {
+                        filesToProcess.Add(row.Cells[1].Value.ToString());
+                    }
+                });
+            if (filesToProcess.Count == 0)
+            {
+                MessageBox.Show("There are no reports selected!");
+                return;
+            }
+            
             // this will fire the background worker to get the reports generated
             if (backgroundWorkerPDF.IsBusy != true)
             {
@@ -94,6 +113,7 @@ namespace Cellcorder_Reporter
                 pDFProgressBar = new PDFProgressBarForm();
                 // event handler for the Cancel button in AlertForm
                 pDFProgressBar.Canceled += new EventHandler<EventArgs>(Button_cancelPDF_Click);
+                pDFProgressBar.StartPosition = FormStartPosition.CenterScreen;
                 pDFProgressBar.Show();
                 pDFProgressBar.ButtonText = "Cancel";
                 // Start the asynchronous operation.
@@ -202,6 +222,16 @@ namespace Cellcorder_Reporter
                 pDFProgressBar = null;
             }
 
+        }
+
+
+        //---------------------------------------------------------------------
+        // if the text is changed, prompt user to save comments
+        //---------------------------------------------------------------------
+        private void Comments_textBox_TextChanged(object sender, EventArgs e)
+        {
+            if (Comments_textBox.Text.Trim() != "No comments.")
+                SaveComments_button.BackColor = Color.Salmon;
         }
     }
 }

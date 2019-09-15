@@ -159,6 +159,7 @@
             // 
             // ButtonCreateSelectedPDFs
             // 
+            this.ButtonCreateSelectedPDFs.Enabled = false;
             this.ButtonCreateSelectedPDFs.Location = new System.Drawing.Point(90, 491);
             this.ButtonCreateSelectedPDFs.Name = "ButtonCreateSelectedPDFs";
             this.ButtonCreateSelectedPDFs.Size = new System.Drawing.Size(201, 23);
@@ -488,6 +489,7 @@
             this.Comments_textBox.Name = "Comments_textBox";
             this.Comments_textBox.Size = new System.Drawing.Size(536, 84);
             this.Comments_textBox.TabIndex = 0;
+            this.Comments_textBox.TextChanged += new System.EventHandler(this.Comments_textBox_TextChanged);
             // 
             // button_EditThresholds
             // 
