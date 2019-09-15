@@ -106,6 +106,8 @@ namespace Cellcorder_Reporter
             return minObject;
         }
 
+        
+
         // need to set the overall float voltage used via property in class
         public float GetOverallFloatVoltage()
         {
@@ -124,6 +126,36 @@ namespace Cellcorder_Reporter
             return maxObject.cellNumber;
         }
 
+
+        //-----------------------------------------------------------------------------------------------------------------
+        //   the following are used for charting purposes
+        //-----------------------------------------------------------------------------------------------------------------
+
+        // method to return the maximum resistance reading of system as a double (used for charting)
+        public double GetMaxResistanceValueAsDouble()
+        {
+            double maxObject = (double)cellReadingsList.OrderByDescending(item => item.resistance).First().resistance;
+            return maxObject;
+        }
+        // method to return the minimum resistance reading of system as a double (used for charting)
+        public double GetMinResistanceValueAsDouble()
+        {
+            double minObject = (double)cellReadingsList.OrderByDescending(item => item.resistance).Last().resistance;
+            return minObject;
+        }
+
+        // method to return the minimum float voltage reading of system as a double (used for charting)
+        public double GetMinFloatValueAsDouble()
+        {
+            double minFloatVal = (double)cellReadingsList.OrderByDescending(item => item.floatVoltage).Last().floatVoltage;
+            return minFloatVal;
+        }
+        // method to return the maximum float voltage reading of system as a double (used for charting)
+        public double GetMaxFloatValueAsDouble()
+        {
+            double maxFloatVal = (double)cellReadingsList.OrderByDescending(item => item.floatVoltage).First().floatVoltage;
+            return maxFloatVal;
+        }
 
     }
 

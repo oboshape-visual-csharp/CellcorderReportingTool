@@ -13,14 +13,19 @@ using Cellcorder_Reporter;
 
 // aliases
 using TabAlignment = MigraDoc.DocumentObjectModel.TabAlignment;
+using System.Globalization;
 
 namespace Cellcorder_Reporter
 {
     public static class CellcorderReporting
     {
-        public static void CreatePDFReport(string forTesting) // string fileName   removed for testing, put back in
-        {
-            string fileName = "7530D1D2_2string";
+        // use this to store the current reading set for each report
+        static TestResult currentResult = null;
+
+        public static void CreatePDFReport(string fileName)
+        { 
+            // grab the test result set that were reporting on
+            currentResult = GlobalData.allTestReadings[fileName];
             // Create the MigraDoc document this will populate the contents
             Document document = CreateDocument();
             // define the pdf renderer object
@@ -32,11 +37,15 @@ namespace Cellcorder_Reporter
 
             // Save the document with the date and time on end of string...
             DateTime currentTime = DateTime.Now;
+
+
             string fileToSave = fileName + "_" + currentTime.ToShortDateString().Replace("/", "") +
                 currentTime.ToShortTimeString().Replace(":", "")
                 + ".pdf";
 
-            renderer.Save(fileToSave);
+            renderer.Save(GlobalData.pdfOutputFolderPath + "\\" + fileToSave);
+            //renderer = null;
+            //document = null;
         }
 
         //---------------------------------------------------------------------
@@ -47,23 +56,37 @@ namespace Cellcorder_Reporter
         {
             // Create a new MigraDoc document
             Document document = new Document();
-            document.Info.Title = "Hello, MigraDoc";
-            document.Info.Subject = "Demonstrates an excerpt of the capabilities of MigraDoc.";
-            document.Info.Author = "Stefan Lange";
+            document.Info.Title = "Norco Cellcorder Report";
+            document.Info.Subject = "Auto Generated PDF report for Cellcorder Data";
+            document.Info.Author = "Application Created by : Darren McBain";
+
+
+            // this will create the different sections that will make up the report
+            // Create all the styles for use within the document
             DefineStyles(document);
+            // define create and add the cover sheet
             DefineCover(document);
-            DefineTableOfContents(document);
-            DefineContentSection(document);
-            DefineParagraphs(document);
-            DefineTables(document);
-            DefineCharts(document);
+            // define, create and add the headers and footers
+            DefineHeadersAndFooters(document);
+            // now create the tabluated cell data
+            DefineTabulatedData(document);
+            // create the float voltage chart
+            DefineVoltageChart(document);
+            // create the resistance value charting
+            DefineResistanceChart(document);
+            // now add the last comments section
+            DefineCommentsSection(document);
+            // Finally return the completed document for rendering
             return document;
+
+
+            //DefineTableOfContents(document);
+            //DefineContentSection(document);
+            //DefineParagraphs(document);
+            //DefineTables(document);
         }
 
-
-        /// <summary>
-        /// Defines the styles used in the document.
-        /// </summary>
+        /// THis method defines all the styles that are to be used in the document
         public static void DefineStyles(Document document)
         {
             // Get the predefined style Normal.
@@ -82,74 +105,272 @@ namespace Cellcorder_Reporter
             style.Font.Color = Colors.DarkBlue;
             style.ParagraphFormat.PageBreakBefore = true;
             style.ParagraphFormat.SpaceAfter = 6;
+
             style = document.Styles["Heading2"];
             style.Font.Size = 12;
             style.Font.Bold = true;
             style.ParagraphFormat.PageBreakBefore = false;
             style.ParagraphFormat.SpaceBefore = 6;
             style.ParagraphFormat.SpaceAfter = 6;
+
             style = document.Styles["Heading3"];
             style.Font.Size = 10;
             style.Font.Bold = true;
             style.Font.Italic = true;
             style.ParagraphFormat.SpaceBefore = 6;
             style.ParagraphFormat.SpaceAfter = 3;
+
             style = document.Styles[StyleNames.Header];
             style.ParagraphFormat.AddTabStop("16cm", TabAlignment.Right);
+
             style = document.Styles[StyleNames.Footer];
             style.ParagraphFormat.AddTabStop("8cm", TabAlignment.Center);
+
             // Create a new style called TextBox based on style Normal
             style = document.Styles.AddStyle("TextBox", "Normal");
             style.ParagraphFormat.Alignment = ParagraphAlignment.Justify;
             style.ParagraphFormat.Borders.Width = 2.5;
             style.ParagraphFormat.Borders.Distance = "3pt";
             style.ParagraphFormat.Shading.Color = Colors.SkyBlue;
+
             // Create a new style called TOC based on style Normal
             style = document.Styles.AddStyle("TOC", "Normal");
             style.ParagraphFormat.AddTabStop("16cm", TabAlignment.Right, TabLeader.Dots);
             style.ParagraphFormat.Font.Color = Colors.Blue;
         }
 
-        /// <summary>
-        /// Defines the cover page.
-        /// </summary>
-        public static void DefineCover(Document document)
+        /// Defines the cover page.  DONE
+        static void DefineCover(Document document)
         {
             Section section = document.AddSection();
 
             Paragraph paragraph = section.AddParagraph();
+            
+            paragraph.AddBookmark("Cover Sheet");
+            paragraph.Format.OutlineLevel = OutlineLevel.Level1;
             paragraph.Format.SpaceAfter = "3cm";
 
+            // adding the LOGO
             Image image = section.AddImage("NorcoLogo.png");
             image.Width = "10cm";
+            image.Left = ShapePosition.Center ;
 
-            paragraph = section.AddParagraph("A sample document that demonstrates the\ncapabilities of MigraDoc");
-            paragraph.Format.Font.Size = 16;
-            paragraph.Format.Font.Color = Colors.DarkRed;
-            paragraph.Format.SpaceBefore = "8cm";
-            paragraph.Format.SpaceAfter = "3cm";
+            // report title
+            paragraph = section.AddParagraph("Battery Resistance Testing Report");
+            paragraph.Format.Alignment = ParagraphAlignment.Center;
+            paragraph.Format.Font.Size = 30;
+            paragraph.Format.Font.Color = Colors.Black;
+            paragraph.Format.Font.Bold = true;
+            paragraph.Format.Font.Underline = Underline.Single;
+            paragraph.Format.SpaceBefore = "3cm";
+            paragraph.Format.SpaceAfter = "1cm";
 
-            paragraph = section.AddParagraph("Rendering date: ");
+            // test location
+            paragraph = section.AddParagraph(currentResult.location);
+            paragraph.Format.Alignment = ParagraphAlignment.Center;
+            paragraph.Format.Font.Size = 22;
+            paragraph.Format.Font.Color = Colors.Black;
+            paragraph.Format.SpaceBefore = "3cm";
+            paragraph.Format.SpaceAfter = "1cm";
+
+            // test battery system
+            paragraph = section.AddParagraph(currentResult.batteryName);
+            paragraph.Format.Alignment = ParagraphAlignment.Center;
+            paragraph.Format.Font.Size = 22;
+            paragraph.Format.Font.Color = Colors.Black;
+            //paragraph.Format.SpaceBefore = "3cm";
+            paragraph.Format.SpaceAfter = "5cm";
+            paragraph = section.AddParagraph("Report Generated on : ");
             paragraph.AddDateField();
         }
 
-        /// <summary>
-        /// Defines the cover page.
-        /// </summary>
-        public static void DefineTableOfContents(Document document)
+        // define the headers and footers
+        static void DefineHeadersAndFooters(Document doc)
+        {
+            Section section = doc.AddSection();
+            HeaderFooter headers = section.Headers.Primary;
+            Paragraph para = headers.AddParagraph(currentResult.batteryName);
+            para.Style = "Heading2";
+            para.Format.Font.Color = Colors.Black;
+            para.Format.Alignment = ParagraphAlignment.Center;
+            para.Format.OutlineLevel = OutlineLevel.BodyText;
+
+            // now to add the table so that its got 3 columns, this is just the column spacings
+            Table table = headers.AddTable();
+            table.Format.Alignment = ParagraphAlignment.Center;
+            table.Borders.Visible = false;
+            Column col = table.AddColumn("5cm");
+            col.Format.Alignment = ParagraphAlignment.Left;
+            col = table.AddColumn("6cm");
+            col.Format.Alignment = ParagraphAlignment.Center;
+            col = table.AddColumn("5cm");
+            col.Format.Alignment = ParagraphAlignment.Right;
+
+            // now we have to add rows to these columns, but only going to populate the left and right, for the first row
+            Row row = table.AddRow();
+            Paragraph rowPara = row.Cells[0].AddParagraph("Battery Dataset Detail Report");
+            rowPara.Format.OutlineLevel = OutlineLevel.BodyText;
+            rowPara.Format.Font.Color = Colors.DarkBlue;
+            rowPara.Format.Font.Size = 11;
+            rowPara.Format.Font.Bold = true;
+            rowPara.Format.Font.Italic = true;
+            rowPara = row.Cells[2].AddParagraph("Install Date : " + GetDateString(currentResult.installDate));
+            rowPara.Format.Font.Color = Colors.Black;
+            rowPara.Format.Font.Size = 11;
+            rowPara.Format.Font.Bold = true;
+
+            // now for the second row, using all three column cells, batt Tag, block type, Location
+            row = table.AddRow();
+            rowPara = row.Cells[0].AddParagraph(currentResult.fileName);
+            rowPara.Format.Font.Size = 11;
+            rowPara.Format.Font.Color = Colors.Black;
+            rowPara.Format.Font.Bold = true;
+            rowPara = row.Cells[1].AddParagraph(currentResult.modelNumber);
+            rowPara.Format.Font.Size = 11;
+            rowPara.Format.Font.Color = Colors.Black;
+            rowPara.Format.Font.Bold = true;
+            rowPara = row.Cells[2].AddParagraph(currentResult.location);
+            rowPara.Format.Font.Size = 11;
+            rowPara.Format.Font.Color = Colors.Black;
+            rowPara.Format.Font.Bold = true;
+
+            // now add a blank colored bar across page, cant mind what its called so
+            para = headers.AddParagraph();
+            para.Format.OutlineLevel = OutlineLevel.BodyText;
+            para.Format.Alignment = ParagraphAlignment.Center;
+            Border border = para.Format.Borders.Bottom;
+            border.Width = 2;
+            border.Color = Colors.DarkRed;
+
+            table = headers.AddTable();
+            headers.Format.Alignment = ParagraphAlignment.Center;
+            table.Borders.Visible = false;
+            col = table.AddColumn("8cm");
+            col.Format.Alignment = ParagraphAlignment.Left;
+            col = table.AddColumn("8cm");
+            col.Format.Alignment = ParagraphAlignment.Center;
+
+            row = table.AddRow();
+            rowPara = row.Cells[0].AddParagraph("Readings Taken : " + currentResult.dateFileCreated);
+            rowPara = row.Cells[1].AddParagraph("Overall Float Voltage : " + currentResult.GetOverallFloatVoltage() + " V");
+            // stick another line below everything in the header
+
+            // now add a blank colored bar across page, cant mind what its called so
+            para = headers.AddParagraph();
+            para.Format.Alignment = ParagraphAlignment.Center;
+            border = para.Format.Borders.Top;
+            border.Width = 2;
+            border.Color = Colors.DarkRed;
+        }
+
+        // create the tablulated date from the results
+        static void DefineTabulatedData(Document doc)
+        {
+            // need to show a table of results for each string in the result set.
+            for (int stringID = 1; stringID <= currentResult.totalStrings; stringID++)
+            {
+                CreateStringTabulatedData(doc, currentResult, stringID);
+            }
+        }
+
+        // create the tabular data for the PDF reports, called from DefineTabulatedData()
+        static void CreateStringTabulatedData(Document doc, TestResult testResult, int _stringNumber)
+        {
+            doc.LastSection.AddPageBreak();
+            //Console.WriteLine("heres the string number : " + _stringNumber);
+            // now sure how to set this globally yet, so ill just do it per section
+            Section section = doc.LastSection;
+            section.PageSetup.TopMargin = 130; // for Header
+            section.PageSetup.BottomMargin = 100; // for Footer
+
+
+            // set up the table main parameters and settings
+            Table tableData = section.AddTable();
+            tableData.Format.Alignment = ParagraphAlignment.Left;
+            tableData.Format.Borders.Visible = true;
+            tableData.Format.Borders.Width = 0;
+            Column col = tableData.AddColumn("2cm");
+            col = tableData.AddColumn("2cm");
+            col = tableData.AddColumn("2cm");
+            col = tableData.AddColumn("2cm");
+            col = tableData.AddColumn("2cm");
+            col = tableData.AddColumn("2cm");
+            col = tableData.AddColumn("2cm");
+            col = tableData.AddColumn("2cm");
+
+            // ok now heres the table headings 
+            Row row = tableData.AddRow();
+            row.Shading.Color = Colors.PaleGoldenrod;
+            row.Cells[0].AddParagraph("String No.");
+            row.Cells[1].AddParagraph("Cell/Jar No.");
+            row.Cells[2].AddParagraph("Cell/Jar Voltage");
+            row.Cells[3].AddParagraph("Internal Resistance ");
+            row.Cells[4].AddParagraph("icR 1");
+            row.Cells[5].AddParagraph("icR 2");
+            row.Cells[6].AddParagraph("icR 3");
+            row.Cells[7].AddParagraph("icR 4");
+
+
+            foreach (CellReading cell in testResult.cellReadingsList)
+            {
+                if (cell.stringNumber == _stringNumber)
+                {
+                    row = tableData.AddRow();
+                    row.Cells[0].AddParagraph(cell.stringNumber.ToString());
+                    row.Cells[1].AddParagraph(cell.cellNumber.ToString());
+                    row.Cells[2].AddParagraph(String.Format("{0:0.00}", cell.floatVoltage));
+                    // this is for coloring the high and low cell voltages
+                    if (cell.floatVoltage > currentResult.highVoltage_threshold)
+                    {
+                        row.Cells[2].Format.Shading.Color = Colors.IndianRed;
+                    }
+                    else if (cell.floatVoltage < currentResult.lowVoltage_threshold)
+                    {
+                        row.Cells[2].Format.Shading.Color = Colors.Yellow;
+                    }
+                    row.Cells[3].AddParagraph(cell.resistance.ToString());
+                    // this is for coloring the table for high and low resistances
+                    if (cell.resistance > currentResult.highResistance_threshold)
+                    {
+                        row.Cells[2].Format.Shading.Color = Colors.IndianRed;
+                    }
+                    else if (cell.resistance < currentResult.lowResistance_threshold)
+                    {
+                        row.Cells[2].Format.Shading.Color = Colors.Yellow;
+                    }
+                    row.Cells[4].AddParagraph(cell.interCell_1_Resistance.ToString());
+                    row.Cells[5].AddParagraph(cell.interCell_2_Resistance.ToString());
+                    row.Cells[6].AddParagraph(cell.interCell_3_Resistance.ToString());
+                    row.Cells[7].AddParagraph(cell.interCell_4_Resistance.ToString());
+                }
+
+            }
+
+        }
+
+        // TODO :  need to get the table of contents done at a later stage
+        static void DefineTableOfContents(Document document)
         {
             Section section = document.LastSection;
 
             section.AddPageBreak();
             Paragraph paragraph = section.AddParagraph("Table of Contents");
+            paragraph.AddBookmark("Table of contents");
             paragraph.Format.Font.Size = 14;
             paragraph.Format.Font.Bold = true;
             paragraph.Format.SpaceAfter = 24;
             paragraph.Format.OutlineLevel = OutlineLevel.Level1;
 
+            // this should add a hyper link to the table of contents
             paragraph = section.AddParagraph();
             paragraph.Style = "TOC";
-            Hyperlink hyperlink = paragraph.AddHyperlink("Paragraphs");
+            Hyperlink hyperlink = paragraph.AddHyperlink("CoverSheet");
+            hyperlink.AddText("Cover Sheet\t");
+            hyperlink.AddPageRefField("Cover Sheet");
+
+            paragraph = section.AddParagraph();
+            paragraph.Style = "TOC";
+            hyperlink = paragraph.AddHyperlink("Paragraphs");
             hyperlink.AddText("Paragraphs\t");
             hyperlink.AddPageRefField("Paragraphs");
 
@@ -166,292 +387,214 @@ namespace Cellcorder_Reporter
             hyperlink.AddPageRefField("Charts");
         }
 
-        /// <summary>
-        /// Defines page setup, headers, and footers.
-        /// </summary>
-        static void DefineContentSection(Document document)
+        // create the charting page for the voltages
+        static void DefineVoltageChart(Document document)
         {
-            Section section = document.AddSection();
-            section.PageSetup.OddAndEvenPagesHeaderFooter = true;
-            section.PageSetup.StartingNumber = 1;
+            Paragraph paragraph = document.LastSection.AddParagraph("Battery Voltage Chart", "Heading1");
+            paragraph.Format.OutlineLevel = OutlineLevel.Level1;
+            paragraph.AddBookmark("VoltageChart");
 
-            HeaderFooter header = section.Headers.Primary;
-            header.AddParagraph("\tOdd Page Header");
-
-            header = section.Headers.EvenPage;
-            header.AddParagraph("Even Page Header");
-
-            // Create a paragraph with centered page number. See definition of style "Footer".
-            Paragraph paragraph = new Paragraph();
-            paragraph.AddTab();
-            paragraph.AddPageField();
-
-            // Add paragraph to footer for odd pages.
-            section.Footers.Primary.Add(paragraph);
-            // Add clone of paragraph to footer for odd pages. Cloning is necessary because an object must
-            // not belong to more than one other object. If you forget cloning an exception is thrown.
-            section.Footers.EvenPage.Add(paragraph.Clone());
-        }
-
-
-        public static void DefineParagraphs(Document document)
-        {
-            Paragraph paragraph = document.LastSection.AddParagraph("Paragraph Layout Overview", "Heading1");
-            paragraph.AddBookmark("Paragraphs");
-
-            DemonstrateAlignment(document);
-            DemonstrateIndent(document);
-            DemonstrateFormattedText(document);
-            DemonstrateBordersAndShading(document);
-        }
-
-        static void DemonstrateAlignment(Document document)
-        {
-            document.LastSection.AddParagraph("Alignment", "Heading2");
-
-            document.LastSection.AddParagraph("Left Aligned", "Heading3");
-
-            Paragraph paragraph = document.LastSection.AddParagraph();
-            paragraph.Format.Alignment = ParagraphAlignment.Left;
-            paragraph.AddText(FillerText.Text);
-
-            document.LastSection.AddParagraph("Right Aligned", "Heading3");
-
-            paragraph = document.LastSection.AddParagraph();
-            paragraph.Format.Alignment = ParagraphAlignment.Right;
-            paragraph.AddText(FillerText.Text);
-
-            document.LastSection.AddParagraph("Centered", "Heading3");
-
-            paragraph = document.LastSection.AddParagraph();
-            paragraph.Format.Alignment = ParagraphAlignment.Center;
-            paragraph.AddText(FillerText.Text);
-
-            document.LastSection.AddParagraph("Justified", "Heading3");
-
-            paragraph = document.LastSection.AddParagraph();
-            paragraph.Format.Alignment = ParagraphAlignment.Justify;
-            paragraph.AddText(FillerText.MediumText);
-        }
-
-        static void DemonstrateIndent(Document document)
-        {
-            document.LastSection.AddParagraph("Indent", "Heading2");
-
-            document.LastSection.AddParagraph("Left Indent", "Heading3");
-
-            Paragraph paragraph = document.LastSection.AddParagraph();
-            paragraph.Format.LeftIndent = "2cm";
-            paragraph.AddText(FillerText.Text);
-
-            document.LastSection.AddParagraph("Right Indent", "Heading3");
-
-            paragraph = document.LastSection.AddParagraph();
-            paragraph.Format.RightIndent = "1in";
-            paragraph.AddText(FillerText.Text);
-
-            document.LastSection.AddParagraph("First Line Indent", "Heading3");
-
-            paragraph = document.LastSection.AddParagraph();
-            paragraph.Format.FirstLineIndent = "12mm";
-            paragraph.AddText(FillerText.Text);
-
-            document.LastSection.AddParagraph("First Line Negative Indent", "Heading3");
-
-            paragraph = document.LastSection.AddParagraph();
-            paragraph.Format.LeftIndent = "1.5cm";
-            paragraph.Format.FirstLineIndent = "-1.5cm";
-            paragraph.AddText(FillerText.Text);
-        }
-
-        static void DemonstrateFormattedText(Document document)
-        {
-            document.LastSection.AddParagraph("Formatted Text", "Heading2");
-
-            //document.LastSection.AddParagraph("Left Aligned", "Heading3");
-
-            Paragraph paragraph = document.LastSection.AddParagraph();
-            paragraph.AddText("Text can be formatted ");
-            paragraph.AddFormattedText("bold", TextFormat.Bold);
-            paragraph.AddText(", ");
-            paragraph.AddFormattedText("italic", TextFormat.Italic);
-            paragraph.AddText(", or ");
-            paragraph.AddFormattedText("bold & italic", TextFormat.Bold | TextFormat.Italic);
-            paragraph.AddText(".");
-            paragraph.AddLineBreak();
-            paragraph.AddText("You can set the ");
-            FormattedText formattedText = paragraph.AddFormattedText("size ");
-            formattedText.Size = 15;
-            paragraph.AddText("the ");
-            formattedText = paragraph.AddFormattedText("color ");
-            formattedText.Color = Colors.Firebrick;
-            paragraph.AddText("the ");
-            formattedText = paragraph.AddFormattedText("font", new Font("Verdana"));
-            paragraph.AddText(".");
-            paragraph.AddLineBreak();
-            paragraph.AddText("You can set the ");
-            formattedText = paragraph.AddFormattedText("subscript");
-            formattedText.Subscript = true;
-            paragraph.AddText(" or ");
-            formattedText = paragraph.AddFormattedText("superscript");
-            formattedText.Superscript = true;
-            paragraph.AddText(".");
-        }
-
-        static void DemonstrateBordersAndShading(Document document)
-        {
-            document.LastSection.AddPageBreak();
-            document.LastSection.AddParagraph("Borders and Shading", "Heading2");
-
-            document.LastSection.AddParagraph("Border around Paragraph", "Heading3");
-
-            Paragraph paragraph = document.LastSection.AddParagraph();
-            paragraph.Format.Borders.Width = 2.5;
-            paragraph.Format.Borders.Color = Colors.Navy;
-            paragraph.Format.Borders.Distance = 3;
-            paragraph.AddText(FillerText.MediumText);
-
-            document.LastSection.AddParagraph("Shading", "Heading3");
-
-            paragraph = document.LastSection.AddParagraph();
-            paragraph.Format.Shading.Color = Colors.LightCoral;
-            paragraph.AddText(FillerText.Text);
-
-            document.LastSection.AddParagraph("Borders & Shading", "Heading3");
-
-            paragraph = document.LastSection.AddParagraph();
-            paragraph.Style = "TextBox";
-            paragraph.AddText(FillerText.MediumText);
-        }
-
-        public static void DefineTables(Document document)
-        {
-            Paragraph paragraph = document.LastSection.AddParagraph("Table Overview", "Heading1");
-            paragraph.AddBookmark("Tables");
-
-            DemonstrateSimpleTable(document);
-            DemonstrateAlignment(document);
-            DemonstrateCellMerge(document);
-        }
-
-        public static void DemonstrateSimpleTable(Document document)
-        {
-            document.LastSection.AddParagraph("Simple Tables", "Heading2");
-
-            Table table = new Table();
-            table.Borders.Width = 0.75;
-
-            Column column = table.AddColumn(Unit.FromCentimeter(2));
-            column.Format.Alignment = ParagraphAlignment.Center;
-
-            table.AddColumn(Unit.FromCentimeter(5));
-
-            Row row = table.AddRow();
-            row.Shading.Color = Colors.PaleGoldenrod;
-            Cell cell = row.Cells[0];
-            cell.AddParagraph("Itemus");
-            cell = row.Cells[1];
-            cell.AddParagraph("Descriptum");
-
-            row = table.AddRow();
-            cell = row.Cells[0];
-            cell.AddParagraph("1");
-            cell = row.Cells[1];
-            cell.AddParagraph(FillerText.ShortText);
-
-            row = table.AddRow();
-            cell = row.Cells[0];
-            cell.AddParagraph("2");
-            cell = row.Cells[1];
-            cell.AddParagraph(FillerText.Text);
-
-            //table.SetEdge(0, 0, 2, 3, Edge.Box, BorderStyle.Single, 1.5, Colors.Black);
-
-            document.LastSection.Add(table);
-        }
-
-        public static void DemonstrateCellMerge(Document document)
-        {
-            document.LastSection.AddParagraph("Cell Merge", "Heading2");
-
-            Table table = document.LastSection.AddTable();
-            table.Borders.Visible = true;
-            table.TopPadding = 5;
-            table.BottomPadding = 5;
-
-            Column column = table.AddColumn();
-            column.Format.Alignment = ParagraphAlignment.Left;
-
-            column = table.AddColumn();
-            column.Format.Alignment = ParagraphAlignment.Center;
-
-            column = table.AddColumn();
-            column.Format.Alignment = ParagraphAlignment.Right;
-
-            table.Rows.Height = 35;
-
-            Row row = table.AddRow();
-            row.Cells[0].AddParagraph("Merge Right");
-            row.Cells[0].MergeRight = 1;
-
-            row = table.AddRow();
-            row.VerticalAlignment = VerticalAlignment.Bottom;
-            row.Cells[0].MergeDown = 1;
-            row.Cells[0].VerticalAlignment = VerticalAlignment.Bottom;
-            row.Cells[0].AddParagraph("Merge Down");
-
-            table.AddRow();
-        }
-
-        public static void DefineCharts(Document document)
-        {
-            Paragraph paragraph = document.LastSection.AddParagraph("Chart Overview", "Heading1");
-            paragraph.AddBookmark("Charts");
-
-            document.LastSection.AddParagraph("Sample Chart", "Heading2");
+            document.LastSection.AddParagraph("Cell Voltages", "Heading2");
 
             Chart chart = new Chart();
             chart.Left = 0;
 
             chart.Width = Unit.FromCentimeter(16);
             chart.Height = Unit.FromCentimeter(12);
+
             Series series = chart.SeriesCollection.AddSeries();
             series.ChartType = ChartType.Column2D;
-            series.Add(new double[] { 1, 17, 45, 5, 3, 20, 11, 23, 8, 19 });
-            series.HasDataLabel = true;
 
-            series = chart.SeriesCollection.AddSeries();
-            series.ChartType = ChartType.Line;
-            series.Add(new double[] { 41, 7, 5, 45, 13, 10, 21, 13, 18, 9 });
+            // create an array of all the battery cell voltages and cell numbers to use as values
+            List<double> cellVoltageValues = new List<double>();
+            List<string> cellXlabels = new List<string>();
+            //int currentStringNo = 1;
 
+            foreach (CellReading reading in currentResult.cellReadingsList)
+            {
+                //// just to get a blank column to seperate strings on table
+                //if (reading.stringNumber > currentStringNo)
+                //{
+                //    currentStringNo++;
+                //    cellVoltageValues.Add(0);
+                //    cellXlabels.Add("");
+
+                //}
+                cellVoltageValues.Add(reading.floatVoltage);
+                cellXlabels.Add(reading.cellNumber.ToString());
+            }
+
+            // now add the voltage data to the chart series
+            series.Add(cellVoltageValues.ToArray());
+            series.HasDataLabel = false;
+
+            // now to color the bar graph for the voltages depending on the current test thresholds
+            var elements = series.Elements.Cast<Point>().ToArray();
+            // since each of the elements will be the same index as the readings, loop through and color accordingly
+            int counterIndex = 0;
+            foreach (CellReading reading in currentResult.cellReadingsList)
+            {
+                if (reading.floatVoltage > currentResult.highVoltage_threshold)
+                {
+                    elements[counterIndex].FillFormat.Color = Colors.Red;
+                }
+                else if (reading.floatVoltage < currentResult.lowVoltage_threshold)
+                {
+                    elements[counterIndex].FillFormat.Color = Colors.Yellow;
+                }
+                else
+                {
+                    elements[counterIndex].FillFormat.Color = Colors.Green;
+                }
+                counterIndex++;
+            }
+
+
+            // create the xlabel series and add the cell numbers
             XSeries xseries = chart.XValues.AddXSeries();
-            xseries.Add("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N");
+            xseries.Add(cellXlabels.ToArray());
 
             chart.XAxis.MajorTickMark = TickMarkType.Outside;
-            chart.XAxis.Title.Caption = "X-Axis";
+            chart.XAxis.Title.Caption = "Cell Numbers";
 
             chart.YAxis.MajorTickMark = TickMarkType.Outside;
+            chart.YAxis.MajorTick = 0.01;
+            chart.YAxis.TickLabels.Format = "0.00";
             chart.YAxis.HasMajorGridlines = true;
+
+            
+            // now to set up the Y axis scales, need to get the min and max floats and put a small tollerance either side
+            // just so that the min and max values arent slap bang on the axis lines
+            double yMin, yMax;
+            yMin = currentResult.GetMinFloatValueAsDouble();
+            yMax = currentResult.GetMaxFloatValueAsDouble();
+            double chartYAxisPadding = (yMax - yMin) * 0.1; // just 10 percent padding for min and max charting values
+
+            chart.YAxis.MinimumScale = currentResult.GetMinFloatValueAsDouble() - chartYAxisPadding;
+            chart.YAxis.MaximumScale = currentResult.GetMaxFloatValueAsDouble() + chartYAxisPadding;
 
             chart.PlotArea.LineFormat.Color = Colors.DarkGray;
             chart.PlotArea.LineFormat.Width = 1;
 
             document.LastSection.Add(chart);
         }
-    }
+
+        // define the charting page for the resistance values
+        static void DefineResistanceChart(Document document)
+        {
+            Paragraph paragraph = document.LastSection.AddParagraph("Battery Resistance Chart", "Heading1");
+            paragraph.AddBookmark("ResistanceChart");
+
+            document.LastSection.AddParagraph("Cell Resistances", "Heading2");
+
+            Chart chart = new Chart();
+            chart.Left = 0;
+
+            chart.Width = Unit.FromCentimeter(16);
+            chart.Height = Unit.FromCentimeter(12);
+
+            Series series = chart.SeriesCollection.AddSeries();
+            series.ChartType = ChartType.Column2D;
+
+            // create an array of all the battery cell voltages and cell numbers to use as values
+            List<double> resistanceValuesList = new List<double>();
+            List<string> cellXlabels = new List<string>();
+            //int currentStringNo = 1;
+
+            foreach (CellReading reading in currentResult.cellReadingsList)
+            {
+                //// just to get a blank column to seperate strings on table
+                //if (reading.stringNumber > currentStringNo)
+                //{
+                //    currentStringNo++;
+                //    cellVoltageValues.Add(0);
+                //    cellXlabels.Add("");
+
+                //}
+                resistanceValuesList.Add(reading.resistance);
+                cellXlabels.Add(reading.cellNumber.ToString());
+            }
+
+            // now add the voltage data to the chart series
+            series.Add(resistanceValuesList.ToArray());
+            series.HasDataLabel = false;
+
+            // now to color the bar graph for the resistance values depending on the current test thresholds
+            var elements = series.Elements.Cast<Point>().ToArray();
+            // since each of the elements will be the same index as the readings, loop through and color accordingly
+            int counterIndex = 0;
+            foreach (CellReading reading in currentResult.cellReadingsList)
+            {
+                if (reading.resistance > currentResult.highResistance_threshold)
+                {
+                    elements[counterIndex].FillFormat.Color = Colors.Red;
+                }
+                else if (reading.resistance < currentResult.lowResistance_threshold)
+                {
+                    elements[counterIndex].FillFormat.Color = Colors.Yellow;
+                }
+                else
+                {
+                    elements[counterIndex].FillFormat.Color = Colors.Blue;
+                }
+                counterIndex++;
+            }
+
+            // create the xlabel series and add the cell numbers
+            XSeries xseries = chart.XValues.AddXSeries();
+            xseries.Add(cellXlabels.ToArray());
+
+            chart.XAxis.MajorTickMark = TickMarkType.Outside;
+            chart.XAxis.Title.Caption = "Cell Numbers";
+
+            chart.YAxis.MajorTickMark = TickMarkType.Outside;
+            chart.YAxis.MajorTick = 100;
+            //chart.YAxis.TickLabels.Format = "0";
+            chart.YAxis.HasMajorGridlines = true;
+
+            // now to set up the Y axis scales, need to get the min and max floats and put a small tollerance either side
+            // just so that the min and max values arent slap bang on the axis lines
+            double yMin, yMax;
+            yMin = currentResult.GetMinResistanceValueAsDouble();
+            yMax = currentResult.GetMaxResistanceValueAsDouble();
+            double chartYAxisPadding = (yMax - yMin) * 0.1; // just 10 percent padding for min and max charting values
+
+            chart.YAxis.MinimumScale = currentResult.GetMinResistanceValueAsDouble() - chartYAxisPadding;
+            chart.YAxis.MaximumScale = currentResult.GetMaxResistanceValueAsDouble() + chartYAxisPadding;
+
+            chart.PlotArea.LineFormat.Color = Colors.DarkGray;
+            chart.PlotArea.LineFormat.Width = 1;
+
+            document.LastSection.Add(chart);
+        }
+
+        // now to pop the comments in at the end of the document
+        static void DefineCommentsSection(Document document)
+        {
+            Paragraph paragraph = document.LastSection.AddParagraph("Closing Report Comments", "Heading1");
+            paragraph.AddBookmark("Comments");
+
+            paragraph = document.LastSection.AddParagraph();
+            paragraph.Format.Alignment = ParagraphAlignment.Left;
+            paragraph.AddText(currentResult.comments);
+        }
 
 
-    public static class FillerText
-    {
-        public static string Text =
-            "there once was a badger called bert, that used to sit on the lawn and drink tea with the shrubbery, this was until" +
-            "the shrubbery advised that is was about to rain, so the Badger decided that it wasnt the right time of year for a shower" +
-            " and therefore retired to the set for dinner and a night in front of the telly.";
-
-        public static String MediumText =
-            "this is the medium test part of the thing, just as a filler";
-
-        public static String ShortText =
-            "this is a sample of the short text.";
+        // since the install date is in a string format in the CSV, need to parse it out to a readable format to allow formatting
+        static string GetDateString(string date)
+        {
+            DateTime theDate;
+            if (DateTime.TryParseExact(date, "MM/dd/yy",
+                    CultureInfo.InvariantCulture, DateTimeStyles.None, out theDate))
+            {
+                // the string was successfully parsed into theDate
+                return theDate.ToString("dd'/'MM'/'yyyy");
+            }
+            else
+            {
+                // the parsing failed, return some sensible default value
+                return "Couldn't read the date";
+            }
+        }
     }
 }

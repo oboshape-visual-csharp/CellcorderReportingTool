@@ -36,7 +36,7 @@
             this.ColCheckBox = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.ColFileName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColViewDataButton = new System.Windows.Forms.DataGridViewButtonColumn();
-            this.ButtonExtractData = new System.Windows.Forms.Button();
+            this.ButtonCreateSelectedPDFs = new System.Windows.Forms.Button();
             this.label_location = new System.Windows.Forms.Label();
             this.label_battery = new System.Windows.Forms.Label();
             this.label_strings = new System.Windows.Forms.Label();
@@ -58,8 +58,6 @@
             this.col_Icr4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.col_SG = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Temp = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.progressBar = new System.Windows.Forms.ProgressBar();
-            this.progressBar_Label = new System.Windows.Forms.Label();
             this.tag_text = new System.Windows.Forms.Label();
             this.label_Tag = new System.Windows.Forms.Label();
             this.groupbox_DataPreview = new System.Windows.Forms.GroupBox();
@@ -72,7 +70,7 @@
             this.Comments_textBox = new System.Windows.Forms.TextBox();
             this.button_EditThresholds = new System.Windows.Forms.Button();
             this.groupBox_fileListing = new System.Windows.Forms.GroupBox();
-            this.TestPDF_button = new System.Windows.Forms.Button();
+            this.backgroundWorkerPDF = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.FileList_DataGrid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.testResults_DataGrid)).BeginInit();
             this.groupbox_DataPreview.SuspendLayout();
@@ -159,14 +157,15 @@
             this.ColViewDataButton.Text = "SHOW";
             this.ColViewDataButton.Width = 80;
             // 
-            // ButtonExtractData
+            // ButtonCreateSelectedPDFs
             // 
-            this.ButtonExtractData.Location = new System.Drawing.Point(90, 553);
-            this.ButtonExtractData.Name = "ButtonExtractData";
-            this.ButtonExtractData.Size = new System.Drawing.Size(201, 23);
-            this.ButtonExtractData.TabIndex = 6;
-            this.ButtonExtractData.Text = "Generate Selected PDF Reports";
-            this.ButtonExtractData.UseVisualStyleBackColor = true;
+            this.ButtonCreateSelectedPDFs.Location = new System.Drawing.Point(90, 491);
+            this.ButtonCreateSelectedPDFs.Name = "ButtonCreateSelectedPDFs";
+            this.ButtonCreateSelectedPDFs.Size = new System.Drawing.Size(201, 23);
+            this.ButtonCreateSelectedPDFs.TabIndex = 6;
+            this.ButtonCreateSelectedPDFs.Text = "Generate Selected PDF Reports";
+            this.ButtonCreateSelectedPDFs.UseVisualStyleBackColor = true;
+            this.ButtonCreateSelectedPDFs.Click += new System.EventHandler(this.ButtonCreateSelectedPDFs_Click);
             // 
             // label_location
             // 
@@ -375,25 +374,6 @@
             this.Temp.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.Temp.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
-            // progressBar
-            // 
-            this.progressBar.ForeColor = System.Drawing.Color.LimeGreen;
-            this.progressBar.Location = new System.Drawing.Point(13, 605);
-            this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(369, 23);
-            this.progressBar.TabIndex = 18;
-            // 
-            // progressBar_Label
-            // 
-            this.progressBar_Label.BackColor = System.Drawing.Color.Transparent;
-            this.progressBar_Label.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.progressBar_Label.Location = new System.Drawing.Point(10, 579);
-            this.progressBar_Label.Name = "progressBar_Label";
-            this.progressBar_Label.Size = new System.Drawing.Size(372, 23);
-            this.progressBar_Label.TabIndex = 19;
-            this.progressBar_Label.Text = "PDF Creation Progress...";
-            this.progressBar_Label.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // tag_text
             // 
             this.tag_text.AutoSize = true;
@@ -530,15 +510,13 @@
             this.groupBox_fileListing.TabStop = false;
             this.groupBox_fileListing.Text = "CSV Test Files (Uncheck Files that are not to be reported on)";
             // 
-            // TestPDF_button
+            // backgroundWorkerPDF
             // 
-            this.TestPDF_button.Location = new System.Drawing.Point(169, 491);
-            this.TestPDF_button.Name = "TestPDF_button";
-            this.TestPDF_button.Size = new System.Drawing.Size(75, 23);
-            this.TestPDF_button.TabIndex = 24;
-            this.TestPDF_button.Text = "TEST PDF";
-            this.TestPDF_button.UseVisualStyleBackColor = true;
-            this.TestPDF_button.Click += new System.EventHandler(this.TestPDF_button_Click);
+            this.backgroundWorkerPDF.WorkerReportsProgress = true;
+            this.backgroundWorkerPDF.WorkerSupportsCancellation = true;
+            this.backgroundWorkerPDF.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BackgroundWorkerPDF_DoWork);
+            this.backgroundWorkerPDF.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BackgroundWorkerPDF_ProgressChanged);
+            this.backgroundWorkerPDF.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BackgroundWorkerPDF_RunWorkerCompleted);
             // 
             // main_Form
             // 
@@ -546,12 +524,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1022, 666);
-            this.Controls.Add(this.TestPDF_button);
             this.Controls.Add(this.groupBox_fileListing);
             this.Controls.Add(this.groupbox_DataPreview);
-            this.Controls.Add(this.progressBar_Label);
-            this.Controls.Add(this.progressBar);
-            this.Controls.Add(this.ButtonExtractData);
+            this.Controls.Add(this.ButtonCreateSelectedPDFs);
             this.Controls.Add(this.SelectCsvFolder_label);
             this.Controls.Add(this.browseForCsv_Button);
             this.Controls.Add(this.csv_TextBox);
@@ -580,14 +555,12 @@
         private System.Windows.Forms.Button browseForCsv_Button;
         private System.Windows.Forms.Label SelectCsvFolder_label;
         public System.Windows.Forms.DataGridView FileList_DataGrid;
-        private System.Windows.Forms.Button ButtonExtractData;
+        private System.Windows.Forms.Button ButtonCreateSelectedPDFs;
         private System.Windows.Forms.Label label_location;
         private System.Windows.Forms.Label label_battery;
         private System.Windows.Forms.Label label_strings;
         private System.Windows.Forms.Label label_datetested;
         private System.Windows.Forms.Label label_cellcount;
-        private System.Windows.Forms.ProgressBar progressBar;
-        private System.Windows.Forms.Label progressBar_Label;
         private System.Windows.Forms.DataGridViewCheckBoxColumn ColCheckBox;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColFileName;
         private System.Windows.Forms.DataGridViewButtonColumn ColViewDataButton;
@@ -619,7 +592,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button TestPDF_button;
+        private System.ComponentModel.BackgroundWorker backgroundWorkerPDF;
     }
 }
 

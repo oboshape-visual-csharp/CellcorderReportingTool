@@ -38,7 +38,9 @@ namespace Cellcorder_Reporter
 
             // save this path in the global data structure
             GlobalData.csvStoragePath = csvFolderLocation;
-            //return csvFolderLocation;
+            
+            //TODO: put this back in later!!! so that users can browse for the CSV folder
+            // return csvFolderLocation;
             return @"C:\_Current Projects\C#\Work CSV Reporting - OLD\CSV Files"; // DEBUGGING
         }
 
