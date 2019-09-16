@@ -40,8 +40,8 @@ namespace Cellcorder_Reporter
             GlobalData.csvStoragePath = csvFolderLocation;
             
             //TODO: put this back in later!!! so that users can browse for the CSV folder
-            // return csvFolderLocation;
-            return @"C:\_Current Projects\C#\Work CSV Reporting - OLD\CSV Files"; // DEBUGGING
+            return csvFolderLocation;
+            //return @"C:\_Current Projects\C#\Work CSV Reporting - OLD\CSV Files"; // DEBUGGING
         }
 
 

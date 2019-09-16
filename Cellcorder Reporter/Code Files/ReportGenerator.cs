@@ -320,7 +320,11 @@ namespace Cellcorder_Reporter
                     row.Cells[1].AddParagraph(cell.cellNumber.ToString());
                     row.Cells[2].AddParagraph(String.Format("{0:0.00}", cell.floatVoltage));
                     // this is for coloring the high and low cell voltages
-                    if (cell.floatVoltage > currentResult.highVoltage_threshold)
+                    if (currentResult.highVoltage_threshold == currentResult.lowVoltage_threshold)
+                    {
+                        // dont color anything since both thresholds are exactly the same
+                    }
+                    else if (cell.floatVoltage > currentResult.highVoltage_threshold)
                     {
                         row.Cells[2].Format.Shading.Color = Colors.IndianRed;
                     }
@@ -329,14 +333,19 @@ namespace Cellcorder_Reporter
                         row.Cells[2].Format.Shading.Color = Colors.Yellow;
                     }
                     row.Cells[3].AddParagraph(cell.resistance.ToString());
+                    
                     // this is for coloring the table for high and low resistances
-                    if (cell.resistance > currentResult.highResistance_threshold)
+                    if (currentResult.lowResistance_threshold == currentResult.highResistance_threshold)
                     {
-                        row.Cells[2].Format.Shading.Color = Colors.IndianRed;
+                        // dont color anything since both thresholds are exactly the same
+                    }
+                    else if (cell.resistance > currentResult.highResistance_threshold)
+                    {
+                        row.Cells[3].Format.Shading.Color = Colors.IndianRed;
                     }
                     else if (cell.resistance < currentResult.lowResistance_threshold)
                     {
-                        row.Cells[2].Format.Shading.Color = Colors.Yellow;
+                        row.Cells[3].Format.Shading.Color = Colors.Yellow;
                     }
                     row.Cells[4].AddParagraph(cell.interCell_1_Resistance.ToString());
                     row.Cells[5].AddParagraph(cell.interCell_2_Resistance.ToString());
@@ -411,6 +420,8 @@ namespace Cellcorder_Reporter
 
             // depending on the number of cells, need to suss out a gap say every 10%
             int xSpacing = (int)(currentResult.cellReadingsList.Count * 0.1);
+            if (xSpacing < 1)
+                xSpacing = 1;
 
             foreach (CellReading reading in currentResult.cellReadingsList)
             {
@@ -439,7 +450,11 @@ namespace Cellcorder_Reporter
             int counterIndex = 0;
             foreach (CellReading reading in currentResult.cellReadingsList)
             {
-                if (reading.floatVoltage > currentResult.highVoltage_threshold)
+                if (currentResult.highVoltage_threshold == currentResult.lowVoltage_threshold)
+                {
+                    elements[counterIndex].FillFormat.Color = Colors.Green;
+                }
+                else if (reading.floatVoltage > currentResult.highVoltage_threshold)
                 {
                     elements[counterIndex].FillFormat.Color = Colors.Red;
                 }
@@ -463,16 +478,23 @@ namespace Cellcorder_Reporter
             chart.XAxis.Title.Caption = "Cell Numbers";
 
             chart.YAxis.MajorTickMark = TickMarkType.Outside;
-            chart.YAxis.MajorTick = 0.01;
+
+            // heres the ymin and max reading values
+            double yMin, yMax;
+            yMin = currentResult.GetMinFloatValueAsDouble();
+            yMax = currentResult.GetMaxFloatValueAsDouble();
+
+            // need to set the Y axis scale to something that wont overlap if too small
+
+            chart.YAxis.MajorTick = (yMax-yMin) * 0.1; // so a tenth of the overall size
             chart.YAxis.TickLabels.Format = "0.00";
             chart.YAxis.HasMajorGridlines = true;
 
             
             // now to set up the Y axis scales, need to get the min and max floats and put a small tollerance either side
+            
+
             // just so that the min and max values arent slap bang on the axis lines
-            double yMin, yMax;
-            yMin = currentResult.GetMinFloatValueAsDouble();
-            yMax = currentResult.GetMaxFloatValueAsDouble();
             double chartYAxisPadding = (yMax - yMin) * 0.1; // just 10 percent padding for min and max charting values
 
             chart.YAxis.MinimumScale = currentResult.GetMinFloatValueAsDouble() - chartYAxisPadding;
@@ -507,6 +529,8 @@ namespace Cellcorder_Reporter
 
             // depending on the number of cells, need to suss out a gap say every 10%
             int xSpacing = (int)(currentResult.cellReadingsList.Count * 0.1);
+            if (xSpacing < 1)
+                xSpacing = 1;
 
             foreach (CellReading reading in currentResult.cellReadingsList)
             {
@@ -535,7 +559,11 @@ namespace Cellcorder_Reporter
             int counterIndex = 0;
             foreach (CellReading reading in currentResult.cellReadingsList)
             {
-                if (reading.resistance > currentResult.highResistance_threshold)
+                if (currentResult.lowResistance_threshold == currentResult.highResistance_threshold)
+                {
+                    elements[counterIndex].FillFormat.Color = Colors.Blue;
+                }
+                else if (reading.resistance > currentResult.highResistance_threshold)
                 {
                     elements[counterIndex].FillFormat.Color = Colors.Red;
                 }
@@ -557,16 +585,19 @@ namespace Cellcorder_Reporter
             chart.XAxis.MajorTickMark = TickMarkType.Outside;
             chart.XAxis.Title.Caption = "Cell Numbers";
 
+            // y values min and max
+            double yMin, yMax;
+            yMin = currentResult.GetMinResistanceValueAsDouble();
+            yMax = currentResult.GetMaxResistanceValueAsDouble();
+
             chart.YAxis.MajorTickMark = TickMarkType.Outside;
-            chart.YAxis.MajorTick = 100;
+            chart.YAxis.MajorTick = (yMax-yMin) * 0.1;
             //chart.YAxis.TickLabels.Format = "0";
             chart.YAxis.HasMajorGridlines = true;
 
             // now to set up the Y axis scales, need to get the min and max floats and put a small tollerance either side
             // just so that the min and max values arent slap bang on the axis lines
-            double yMin, yMax;
-            yMin = currentResult.GetMinResistanceValueAsDouble();
-            yMax = currentResult.GetMaxResistanceValueAsDouble();
+           
             double chartYAxisPadding = (yMax - yMin) * 0.1; // just 10 percent padding for min and max charting values
 
             chart.YAxis.MinimumScale = currentResult.GetMinResistanceValueAsDouble() - chartYAxisPadding;

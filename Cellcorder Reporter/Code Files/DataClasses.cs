@@ -151,7 +151,7 @@ namespace Cellcorder_Reporter
             return minFloatVal;
         }
         // method to return the maximum float voltage reading of system as a double (used for charting)
-        public double GetMaxFloatValueAsDouble()
+        public double GetMaxFloatValueAsDouble() 
         {
             double maxFloatVal = (double)cellReadingsList.OrderByDescending(item => item.floatVoltage).First().floatVoltage;
             return maxFloatVal;
