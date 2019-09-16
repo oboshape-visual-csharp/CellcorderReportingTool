@@ -28,11 +28,11 @@ namespace Cellcorder_Reporter
         //---------------------------------------------------------------------
         private void Browse_for_CSV_Button_Click(object sender, EventArgs e)
         {
-            csv_TextBox.Text = UI.GetCsvFolderLocation().Trim();
+            csv_TextBox.Text = UI.Get_CDF_FolderLocation().Trim();
             if (csv_TextBox.Text != "")
             {
                 // set the gobal info for the CSV Location
-                GlobalData.csvStoragePath = csv_TextBox.Text;
+                GlobalData.cdf_StoragePath = csv_TextBox.Text;
                 GlobalData.allTestReadings = new Dictionary<string, TestResult>();  // reset this for new data
                 UI.ShowListInGrid(csv_TextBox.Text);
                 // enable the create PDF button
@@ -40,7 +40,7 @@ namespace Cellcorder_Reporter
             }
             else
             {
-                GlobalData.csvStoragePath = null;
+                GlobalData.cdf_StoragePath = null;
             }
         }
 
@@ -159,7 +159,7 @@ namespace Cellcorder_Reporter
 
             // since theres at least one, get the location from that
             string location = GlobalData.allTestReadings[filesToProcess[0]].location;
-            string PDFFolderPath = GlobalData.csvStoragePath + "\\" + "PDF Reports";
+            string PDFFolderPath = GlobalData.cdf_StoragePath + "\\" + "PDF Reports";
 
             // create an outputfolder to write PDFs to, in the folder that contains the CSV Files
             System.IO.Directory.CreateDirectory(PDFFolderPath);

@@ -56,7 +56,9 @@ namespace Cellcorder_Reporter
         public DateTime     dateFileCreated;
         public String       location;
         public String       batteryName;
+        public String       stringName;
         public int          totalStrings;
+        public int          cellsPerString;
         public String       modelNumber;
         public String       installDate;
         public float        highVoltage_threshold;

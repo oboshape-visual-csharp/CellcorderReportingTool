@@ -86,7 +86,6 @@
             this.csv_TextBox.ShortcutsEnabled = false;
             this.csv_TextBox.Size = new System.Drawing.Size(242, 20);
             this.csv_TextBox.TabIndex = 0;
-            this.csv_TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // browseForCsv_Button
             // 
@@ -105,7 +104,7 @@
             this.SelectCsvFolder_label.Name = "SelectCsvFolder_label";
             this.SelectCsvFolder_label.Size = new System.Drawing.Size(265, 13);
             this.SelectCsvFolder_label.TabIndex = 2;
-            this.SelectCsvFolder_label.Text = "Select folder that contains CSV files..";
+            this.SelectCsvFolder_label.Text = "Select folder that contains CDF files..";
             // 
             // FileList_DataGrid
             // 
@@ -510,7 +509,7 @@
             this.groupBox_fileListing.Size = new System.Drawing.Size(354, 365);
             this.groupBox_fileListing.TabIndex = 23;
             this.groupBox_fileListing.TabStop = false;
-            this.groupBox_fileListing.Text = "CSV Test Files (Uncheck Files that are not to be reported on)";
+            this.groupBox_fileListing.Text = "CDF  Files List (Tick files to report on once reviewed)";
             // 
             // backgroundWorkerPDF
             // 

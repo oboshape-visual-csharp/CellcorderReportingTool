@@ -11,7 +11,7 @@ namespace Cellcorder_Reporter
     public static class GlobalData
     {
         // the following two will be retained each time app is opened
-        public static string csvStoragePath = null;
+        public static string cdf_StoragePath = null;
         public static string pdfOutputFolderPath = null;
 
         // reference to the main form

@@ -144,10 +144,9 @@ namespace Cellcorder_Reporter
         {
             Section section = document.AddSection();
 
-            Paragraph paragraph = section.AddParagraph();
-            
-            paragraph.AddBookmark("Cover Sheet");
+            Paragraph paragraph = section.AddParagraph("Cover Sheet", "Heading1");
             paragraph.Format.OutlineLevel = OutlineLevel.Level1;
+
             paragraph.Format.SpaceAfter = "3cm";
 
             // adding the LOGO
@@ -280,7 +279,7 @@ namespace Cellcorder_Reporter
             //Console.WriteLine("heres the string number : " + _stringNumber);
             // now sure how to set this globally yet, so ill just do it per section
             Section section = doc.LastSection;
-            section.PageSetup.TopMargin = 130; // for Header
+            section.PageSetup.TopMargin = 200; // for Header
             section.PageSetup.BottomMargin = 100; // for Footer
 
 
@@ -358,52 +357,54 @@ namespace Cellcorder_Reporter
         }
 
         // TODO :  need to get the table of contents done at a later stage
-        static void DefineTableOfContents(Document document)
-        {
-            Section section = document.LastSection;
+        //static void DefineTableOfContents(Document document)
+        //{
+        //    Section section = document.LastSection;
 
-            section.AddPageBreak();
-            Paragraph paragraph = section.AddParagraph("Table of Contents");
-            paragraph.AddBookmark("Table of contents");
-            paragraph.Format.Font.Size = 14;
-            paragraph.Format.Font.Bold = true;
-            paragraph.Format.SpaceAfter = 24;
-            paragraph.Format.OutlineLevel = OutlineLevel.Level1;
+        //    section.AddPageBreak();
+        //    Paragraph paragraph = section.AddParagraph("Table of Contents");
+        //    //paragraph.AddBookmark("Table of contents");
+        //    paragraph.Format.Font.Size = 14;
+        //    paragraph.Format.Font.Bold = true;
+        //    paragraph.Format.SpaceAfter = 24;
+        //    paragraph.Format.OutlineLevel = OutlineLevel.Level1;
 
-            // this should add a hyper link to the table of contents
-            paragraph = section.AddParagraph();
-            paragraph.Style = "TOC";
-            Hyperlink hyperlink = paragraph.AddHyperlink("CoverSheet");
-            hyperlink.AddText("Cover Sheet\t");
-            hyperlink.AddPageRefField("Cover Sheet");
+        //    // this should add a hyper link to the table of contents
+        //    paragraph = section.AddParagraph();
+        //    paragraph.Style = "TOC";
+        //    Hyperlink hyperlink = paragraph.AddHyperlink("CoverSheet");
+        //    hyperlink.AddText("Cover Sheet\t");
+        //    hyperlink.AddPageRefField("Cover Sheet");
 
-            paragraph = section.AddParagraph();
-            paragraph.Style = "TOC";
-            hyperlink = paragraph.AddHyperlink("Paragraphs");
-            hyperlink.AddText("Paragraphs\t");
-            hyperlink.AddPageRefField("Paragraphs");
+        //    paragraph = section.AddParagraph();
+        //    paragraph.Style = "TOC";
+        //    hyperlink = paragraph.AddHyperlink("Paragraphs");
+        //    hyperlink.AddText("Paragraphs\t");
+        //    hyperlink.AddPageRefField("Paragraphs");
 
-            paragraph = section.AddParagraph();
-            paragraph.Style = "TOC";
-            hyperlink = paragraph.AddHyperlink("Tables");
-            hyperlink.AddText("Tables\t");
-            hyperlink.AddPageRefField("Tables");
+        //    paragraph = section.AddParagraph();
+        //    paragraph.Style = "TOC";
+        //    hyperlink = paragraph.AddHyperlink("Tables");
+        //    hyperlink.AddText("Tables\t");
+        //    hyperlink.AddPageRefField("Tables");
 
-            paragraph = section.AddParagraph();
-            paragraph.Style = "TOC";
-            hyperlink = paragraph.AddHyperlink("Charts");
-            hyperlink.AddText("Charts\t");
-            hyperlink.AddPageRefField("Charts");
-        }
+        //    paragraph = section.AddParagraph();
+        //    paragraph.Style = "TOC";
+        //    hyperlink = paragraph.AddHyperlink("Charts");
+        //    hyperlink.AddText("Charts\t");
+        //    hyperlink.AddPageRefField("Charts");
+        //}
 
         // create the charting page for the voltages
         static void DefineVoltageChart(Document document)
         {
             Paragraph paragraph = document.LastSection.AddParagraph("Battery Voltage Chart", "Heading1");
-            paragraph.Format.OutlineLevel = OutlineLevel.Level1;
-            paragraph.AddBookmark("VoltageChart");
+            
+            //paragraph.Format.OutlineLevel = OutlineLevel.Level1;
+            //paragraph.AddBookmark("VoltageChart");
 
-            document.LastSection.AddParagraph("Cell Voltages", "Heading2");
+            paragraph = document.LastSection.AddParagraph("Cell Voltages", "Heading2");
+            paragraph.Format.OutlineLevel = OutlineLevel.BodyText;
 
             Chart chart = new Chart();
             chart.Left = 0;
@@ -432,7 +433,7 @@ namespace Cellcorder_Reporter
                 if (reading.cellNumber % xSpacing == 0)
                 {
                     cellXlabels.Add(reading.cellNumber.ToString());
-                    Console.WriteLine(reading.cellNumber.ToString());
+                    //Console.WriteLine(reading.cellNumber.ToString());
                 }
                 else
                 {
@@ -510,9 +511,10 @@ namespace Cellcorder_Reporter
         static void DefineResistanceChart(Document document)
         {
             Paragraph paragraph = document.LastSection.AddParagraph("Battery Resistance Chart", "Heading1");
-            paragraph.AddBookmark("ResistanceChart");
+            //paragraph.AddBookmark("ResistanceChart");
 
-            document.LastSection.AddParagraph("Cell Resistances", "Heading2");
+            paragraph = document.LastSection.AddParagraph("Cell Resistances", "Heading2");
+            paragraph.Format.OutlineLevel = OutlineLevel.BodyText;
 
             Chart chart = new Chart();
             chart.Left = 0;
@@ -541,7 +543,7 @@ namespace Cellcorder_Reporter
                 if(reading.cellNumber % xSpacing == 0)
                 {
                     cellXlabels.Add(reading.cellNumber.ToString());
-                    Console.WriteLine(reading.cellNumber.ToString());
+                    //Console.WriteLine(reading.cellNumber.ToString());
                 }
                 else
                 {
@@ -613,9 +615,10 @@ namespace Cellcorder_Reporter
         static void DefineCommentsSection(Document document)
         {
             Paragraph paragraph = document.LastSection.AddParagraph("Closing Report Comments", "Heading1");
-            paragraph.AddBookmark("Comments");
+            //paragraph.AddBookmark("Comments");
 
             paragraph = document.LastSection.AddParagraph();
+            paragraph.Format.OutlineLevel = OutlineLevel.BodyText;
             paragraph.Format.Alignment = ParagraphAlignment.Left;
             paragraph.AddText(currentResult.comments);
         }

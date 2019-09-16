@@ -56,7 +56,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Code Files\CsvParser.cs" />
+    <Compile Include="Code Files\CSVParser.cs" />
+    <Compile Include="Code Files\CDFParser.cs" />
     <Compile Include="Code Files\DataClasses.cs" />
     <Compile Include="Code Files\GlobalData.cs" />
     <Compile Include="Code Files\MainFormControls.cs" />

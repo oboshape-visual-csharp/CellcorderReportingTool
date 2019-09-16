@@ -11,7 +11,7 @@ using Cellcorder_Reporter;
 
 namespace Cellcorder_Reporter
 {
-    static class Parser
+    static class CSV_Parser
     {
         //---------------------------------------------------------------------
         // takes a string filename and returns a complete TestResult for a system
@@ -191,18 +191,8 @@ namespace Cellcorder_Reporter
                 }
 
             }
-
-
-
             // returns the completed set of test data for that system
             return currentResult;
         }
-
-
-
-
-
-
-
     }
 }

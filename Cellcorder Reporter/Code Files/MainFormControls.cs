@@ -16,14 +16,14 @@ namespace Cellcorder_Reporter
         //---------------------------------------------------------------------
         //Method that gets the folder selected from the browse button
         //---------------------------------------------------------------------
-        public static string GetCsvFolderLocation()
+        public static string Get_CDF_FolderLocation()
         {
             string csvFolderLocation = "";
 
             FolderBrowserDialog browserDialogue = new FolderBrowserDialog
             {
                 ShowNewFolderButton = false,
-                Description = "Select location of folder that contains CSV files."
+                Description = "Select location of folder that contains CDF files."
             };
 
             DialogResult dialogueResult = browserDialogue.ShowDialog();
@@ -37,7 +37,7 @@ namespace Cellcorder_Reporter
             browserDialogue = null;
 
             // save this path in the global data structure
-            GlobalData.csvStoragePath = csvFolderLocation;
+            GlobalData.cdf_StoragePath = csvFolderLocation;
             
             //TODO: put this back in later!!! so that users can browse for the CSV folder
             return csvFolderLocation;
@@ -56,7 +56,7 @@ namespace Cellcorder_Reporter
             List<String> invalidFiles = new List<string>();  // records invalid files
             List<String> validFileList = new List<string>();
 
-            foreach (string item in Directory.GetFiles(_path, "*.CSV"))
+            foreach (string item in Directory.GetFiles(_path, "*.CDF"))
             {
                 try
                 {
@@ -115,11 +115,11 @@ namespace Cellcorder_Reporter
                 // try to parse each one as it is added and capture any errors here.
                 try
                 {
-                    TestResult tempResult =  Parser.ParseCSV(item);
+                    TestResult tempResult =  CDF_Parser.ParseCDF(item);
                     GlobalData.allTestReadings.Add(Path.GetFileNameWithoutExtension(item), tempResult);
 
                     form.FileList_DataGrid.Rows.Add(
-                    true,
+                    false, // just setting the checkbox to false default, so put a tick in once reviewed for printing
                     Path.GetFileNameWithoutExtension(item),
                     "Review Data"
                     );
@@ -146,7 +146,7 @@ namespace Cellcorder_Reporter
             //---------------------------------------------------------------------
             for (int i = 0; i < form.FileList_DataGrid.Rows.Count; i++)
             {
-                form.FileList_DataGrid.Rows[i].DefaultCellStyle.BackColor = Color.PaleGreen;
+                form.FileList_DataGrid.Rows[i].DefaultCellStyle.BackColor = Color.Salmon;
                 //if (i % 2 != 0)
                 //{
                 //    // this colors the whole line
@@ -177,7 +177,7 @@ namespace Cellcorder_Reporter
                     if ((bool)cell.Value == true)
                     {
                         cell.Value = false;
-                        row.DefaultCellStyle.BackColor = Color.Crimson; // unselected color
+                        row.DefaultCellStyle.BackColor = Color.Salmon; // unselected color
                     }
                     else
                     {
