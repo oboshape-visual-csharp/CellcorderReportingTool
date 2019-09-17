@@ -137,6 +137,14 @@ namespace Cellcorder_Reporter
             style = document.Styles.AddStyle("TOC", "Normal");
             style.ParagraphFormat.AddTabStop("16cm", TabAlignment.Right, TabLeader.Dots);
             style.ParagraphFormat.Font.Color = Colors.Blue;
+
+            style = document.Styles.AddStyle("Hidden", "Normal");
+            style.Font.Size = 1;
+            style.Font.Bold = false;
+            style.Font.Color = Colors.White;
+            style.ParagraphFormat.PageBreakBefore = false;
+            style.ParagraphFormat.SpaceBefore = 0;
+            style.ParagraphFormat.SpaceAfter = 0;
         }
 
         /// Defines the cover page.  DONE
@@ -144,7 +152,7 @@ namespace Cellcorder_Reporter
         {
             Section section = document.AddSection();
 
-            Paragraph paragraph = section.AddParagraph("Cover Sheet", "Heading1");
+            Paragraph paragraph = section.AddParagraph("Cover Sheet", "Hidden");
             paragraph.Format.OutlineLevel = OutlineLevel.Level1;
 
             paragraph.Format.SpaceAfter = "3cm";
@@ -213,7 +221,7 @@ namespace Cellcorder_Reporter
             rowPara.Format.Font.Size = 11;
             rowPara.Format.Font.Bold = true;
             rowPara.Format.Font.Italic = true;
-            rowPara = row.Cells[2].AddParagraph("Install Date : " + GetDateString(currentResult.installDate));
+            rowPara = row.Cells[2].AddParagraph("Install Date : " + currentResult.installDate);
             rowPara.Format.Font.Color = Colors.Black;
             rowPara.Format.Font.Size = 11;
             rowPara.Format.Font.Bold = true;
@@ -276,9 +284,15 @@ namespace Cellcorder_Reporter
         static void CreateStringTabulatedData(Document doc, TestResult testResult, int _stringNumber)
         {
             doc.LastSection.AddPageBreak();
+            
             //Console.WriteLine("heres the string number : " + _stringNumber);
             // now sure how to set this globally yet, so ill just do it per section
             Section section = doc.LastSection;
+
+            // Add a hidden bookmark for the tabulated page ;)
+            Paragraph paragraph = section.AddParagraph("Tabulated Data", "Hidden");
+            paragraph.Format.OutlineLevel = OutlineLevel.Level1;
+
             section.PageSetup.TopMargin = 200; // for Header
             section.PageSetup.BottomMargin = 100; // for Footer
 
@@ -623,22 +637,5 @@ namespace Cellcorder_Reporter
             paragraph.AddText(currentResult.comments);
         }
 
-
-        // since the install date is in a string format in the CSV, need to parse it out to a readable format to allow formatting
-        static string GetDateString(string date)
-        {
-            DateTime theDate;
-            if (DateTime.TryParseExact(date, "MM/dd/yy",
-                    CultureInfo.InvariantCulture, DateTimeStyles.None, out theDate))
-            {
-                // the string was successfully parsed into theDate
-                return theDate.ToString("dd'/'MM'/'yyyy");
-            }
-            else
-            {
-                // the parsing failed, return some sensible default value
-                return "Couldn't read the date";
-            }
-        }
     }
 }

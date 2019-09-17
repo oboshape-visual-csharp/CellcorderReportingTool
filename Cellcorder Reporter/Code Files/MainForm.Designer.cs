@@ -509,7 +509,7 @@
             this.groupBox_fileListing.Size = new System.Drawing.Size(354, 365);
             this.groupBox_fileListing.TabIndex = 23;
             this.groupBox_fileListing.TabStop = false;
-            this.groupBox_fileListing.Text = "CDF  Files List (Tick files to report on once reviewed)";
+            this.groupBox_fileListing.Text = "Tick files to report on,  shown BOLD if currently reviewing";
             // 
             // backgroundWorkerPDF
             // 

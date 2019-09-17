@@ -13,6 +13,12 @@ namespace Cellcorder_Reporter
     public static class UI
     {
 
+        // previously clicked style to reset once a different row is previewed to reset it
+        static DataGridViewCellStyle PreviousClickedCellStyle = null;
+        static int _previouslyClickedRowIndex = 0;
+
+
+        static DataGridViewButtonCell previousReviwedButton = null;
         //---------------------------------------------------------------------
         //Method that gets the folder selected from the browse button
         //---------------------------------------------------------------------
@@ -124,7 +130,7 @@ namespace Cellcorder_Reporter
                     "Review Data"
                     );
                 }
-                catch (FormatException)
+                catch (Exception)
                 {
                     Console.WriteLine("thrown from parsing and ShowListInGrid: " + Path.GetFileNameWithoutExtension(item));
                     errorList.Add(Path.GetFileNameWithoutExtension(item));
@@ -136,7 +142,7 @@ namespace Cellcorder_Reporter
                 errorList.Insert(0,"The following files are in the incorrect format and can not be read.\n\n");
                 errorList.Add("\n\nCheck these files if required and reselect folder with browse button.");
                 // show any errors as a message box
-                MessageBox.Show(string.Join<string>("", errorList),
+                MessageBox.Show(string.Join<string>("\n", errorList),
                     "File Formatting error..", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
@@ -190,8 +196,25 @@ namespace Cellcorder_Reporter
                 if(e.ColumnIndex == 2)
                 {
                     DataGridViewButtonCell butCell = (DataGridViewButtonCell)row.Cells[2];
-                    //string fileToShow = senderGrid.Columns[1].Row[e.RowIndex]
                     string fileToExamine =  senderGrid.Rows[e.RowIndex].Cells[1].Value.ToString();
+
+                    // need to reset the previously clicked row back to its original style if there is one set
+                    if (PreviousClickedCellStyle != null)
+                    {
+                        senderGrid.Rows[_previouslyClickedRowIndex].Cells[1].Style = PreviousClickedCellStyle;
+                       PreviousClickedCellStyle.Font = new Font(senderGrid.Font, FontStyle.Regular);
+                    }
+
+                    PreviousClickedCellStyle = senderGrid.Rows[e.RowIndex].Cells[1].Style;
+                    _previouslyClickedRowIndex = e.RowIndex;
+
+                    // need to change the font of the name to BOLD just to indicate what is being previewed
+                    DataGridViewCellStyle tempStyle = senderGrid.Rows[e.RowIndex].Cells[1].Style;
+                    tempStyle.Font = new Font(senderGrid.Font, FontStyle.Bold);
+                    senderGrid.Rows[e.RowIndex].Cells[1].Style = tempStyle;
+
+                    
+
                     // now fire this off to another method to display it in the grid.
                     PreviewFile(fileToExamine);
                 }
